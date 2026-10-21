@@ -12,18 +12,29 @@
     .watermark-table {
       position: relative;
     }
+    /* CIRCULAR WATERMARK BADGE */
     .watermark-table::after {
-      content: "Anaya Automobiles Car Market";
+      content: "ANAYA AUTOMOBILES\A CAR MARKET";
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) rotate(-25deg);
-      font-size: 16px;
-      font-weight: bold;
-      color: rgba(0, 0, 0, 0.06);
-      white-space: nowrap;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(0, 0, 0, 0.08);
+      text-align: center;
+      white-space: pre-wrap;
       pointer-events: none;
       z-index: 0;
+      border: 3px dashed rgba(0, 0, 0, 0.08);
+      border-radius: 50%;
+      padding: 18px 10px;
+      line-height: 1.2;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -152,20 +163,29 @@
         <div class="bg-white p-6 rounded-lg shadow flex flex-col justify-between">
           <div>
             <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
-            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-2">
+            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-3">
+              <!-- HEADER -->
               <div class="text-center border-b pb-2">
                 <h1 class="text-base font-bold uppercase">Anaya Automobiles Car Market</h1>
                 <p>Amarpur Road Barhi</p>
                 <p class="text-[10px] text-gray-600">Mo: 9893931743, 7999367203</p>
-                <p id="prev-inv-no" class="font-semibold mt-1 text-blue-600"></p>
-                <p id="prev-date"></p>
               </div>
-              <div>
-                <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
-                <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
-                <p><strong>Vehicle:</strong> <span id="prev-vehicle-model">-</span> (<span id="prev-vehicle-no">-</span>)</p>
+
+              <!-- CUSTOMER & INVOICE FORMAT -->
+              <div class="flex justify-between items-start border-b pb-2 text-xs">
+                <div class="space-y-1">
+                  <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
+                  <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
+                  <p><strong>Vehicle:</strong> <span id="prev-vehicle-model">-</span> (<span id="prev-vehicle-no">-</span>)</p>
+                </div>
+                <div class="text-right space-y-1">
+                  <p><strong>Invoice:</strong> <span id="prev-inv-no" class="font-semibold text-blue-600">INV-1001</span></p>
+                  <p><strong>Date:</strong> <span id="prev-date"></span></p>
+                </div>
               </div>
-              <div class="watermark-table">
+
+              <!-- WATERMARK & TABLE -->
+              <div class="watermark-table my-2">
                 <table class="w-full border-collapse border border-gray-300 text-xs relative z-10 bg-transparent">
                   <thead>
                     <tr class="bg-gray-50">
@@ -180,10 +200,23 @@
                   </tbody>
                 </table>
               </div>
-              <div class="flex justify-between pt-1">
+
+              <!-- TOTAL & PAYMENT -->
+              <div class="flex justify-between items-center border-b pb-2">
                 <span class="font-semibold">Payment: <span id="prev-pay-mode">Cash</span></span>
                 <span class="font-bold text-sm">Grand Total: ₹<span id="prev-total">0</span></span>
               </div>
+
+              <!-- SIGNATURE & HINDI THANK YOU -->
+              <div class="pt-4 flex justify-between items-end">
+                <div class="text-left font-medium text-slate-700">
+                  <p class="text-xs">धन्यवाद 🙏 पुनः पधारें</p>
+                </div>
+                <div class="text-center">
+                  <p class="border-t border-gray-400 px-3 pt-1 text-[10px] font-semibold text-gray-600">Authorised Signatory</p>
+                </div>
+              </div>
+
             </div>
           </div>
           <button onclick="printCurrentPreview()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded shadow text-sm">🖨️ Quick Print</button>

@@ -298,8 +298,8 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Updated Google Apps Script Webhook URL with Version 6 deployment
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxc5GhuNN2_t6RnXuS2rgAj_r3j0h5riW6gL3ltdUTYECRCRrwloANtKpAchDomSfKI-A/exec";
+    // Updated Google Apps Script Webhook URL with Version 7 deployment
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4ItbHvzYz4veHtNZozlYuxouuEm8uwwhc7cQPqpjMYxzQqaLljmfwbDzDU2TzAWkg-w/exec";
 
     let currentBillItems = [];
     let allBillsCache = [];
@@ -455,7 +455,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(invoiceData)
           });
-          alert('Bill Saved, Synced & Email Triggered Successfully!');
+          alert('Bill Saved, Synced & Professional Emails Triggered Successfully!');
         }
 
         printCurrentPreview();

@@ -298,8 +298,8 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Updated Google Apps Script Webhook URL
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7opSOdcFfDIaDePFsFbSZGyFU-cBOYtA6o5B6VTiav5gv2tIaUXX7C28zc0k-U9QlkQ/exec";
+    // Updated Google Apps Script Webhook URL with Version 5 deployment
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEi3czE3ZzBqx-TEth0zRTRblxpCUBRtXo3cHlpuAOWKyPxphXqD17Taw0msvaQJ5O/exec";
 
     let currentBillItems = [];
     let allBillsCache = [];
@@ -455,7 +455,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(invoiceData)
           });
-          alert('Bill Saved & Synced to Google Sheet Successfully!');
+          alert('Bill Saved, Synced & Email Triggered Successfully!');
         }
 
         printCurrentPreview();
@@ -581,7 +581,7 @@
               <td class="border p-2">${item.name}</td>
               <td class="border p-2">₹${item.price}</td>
               <td class="border p-2">${item.stock}</td>
-              <td class="footer p-2">
+              <td class="border p-2">
                 <button onclick="deleteStockItem('${doc.id}')" class="text-red-600 font-semibold text-xs">Delete</button>
               </td>
             </tr>

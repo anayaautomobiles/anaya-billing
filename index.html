@@ -6,8 +6,6 @@
   <title>Anaya Automobiles - Billing & Inventory Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- html2pdf JS for PDF Generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Firebase App & Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -69,11 +67,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-              <input type="text" id="cust-name" class="w-full mt-1 p-2 border rounded">
+              <input type="text" id="cust-name" oninput="updatePreview()" class="w-full mt-1 p-2 border rounded">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
-              <input type="text" id="cust-mobile" class="w-full mt-1 p-2 border rounded">
+              <input type="text" id="cust-mobile" oninput="updatePreview()" class="w-full mt-1 p-2 border rounded">
             </div>
           </div>
 
@@ -119,35 +117,40 @@
           <button onclick="submitAndPrintBill()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow">Generate & Save Bill (Auto-Sync)</button>
         </div>
 
-        <!-- LIVE BILL PREVIEW -->
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
-          <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-3">
-            <div class="text-center border-b pb-2">
-              <h1 class="text-base font-bold uppercase">Anaya Automobiles</h1>
-              <p>Katni, Madhya Pradesh - 483770</p>
-              <p id="prev-inv-no" class="font-semibold mt-1"></p>
-              <p id="prev-date"></p>
-            </div>
-            <div>
-              <p><strong>Customer:</strong> <span id="prev-cust-name"></span></p>
-              <p><strong>Mobile:</strong> <span id="prev-cust-mobile"></span></p>
-            </div>
-            <table class="w-full border-collapse border border-gray-300 text-xs">
-              <thead>
-                <tr class="bg-gray-50">
-                  <th class="border p-1">Item</th>
-                  <th class="border p-1">Price</th>
-                  <th class="border p-1">Qty</th>
-                  <th class="border p-1">Total</th>
-                </tr>
-              </thead>
-              <tbody id="prev-items-body"></tbody>
-            </table>
-            <div class="text-right font-bold text-sm pt-2">
-              <p>Grand Total: ₹<span id="prev-total">0</span></p>
+        <!-- LIVE BILL PREVIEW & PRINT -->
+        <div class="bg-white p-6 rounded-lg shadow flex flex-col justify-between">
+          <div>
+            <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
+            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-3">
+              <div class="text-center border-b pb-2">
+                <h1 class="text-base font-bold uppercase">Anaya Automobiles</h1>
+                <p>Katni, Madhya Pradesh - 483770</p>
+                <p id="prev-inv-no" class="font-semibold mt-1"></p>
+                <p id="prev-date"></p>
+              </div>
+              <div>
+                <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
+                <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
+              </div>
+              <table class="w-full border-collapse border border-gray-300 text-xs">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="border p-1">Item</th>
+                    <th class="border p-1">Price</th>
+                    <th class="border p-1">Qty</th>
+                    <th class="border p-1">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="prev-items-body">
+                  <tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>
+                </tbody>
+              </table>
+              <div class="text-right font-bold text-sm pt-2">
+                <p>Grand Total: ₹<span id="prev-total">0</span></p>
+              </div>
             </div>
           </div>
+          <button onclick="printBillDirect()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded shadow text-sm">🖨️ Print Bill / Save PDF</button>
         </div>
       </section>
 
@@ -174,7 +177,6 @@
   </div>
 
   <script>
-    // FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyA2hfa5mGhR-gNfH_d33wnTCl90Yh62Ipc",
       authDomain: "anaya-automobiles.firebaseapp.com",
@@ -192,7 +194,6 @@
 
     let currentBillItems = [];
 
-    // AUTH LISTENERS
     auth.onAuthStateChanged(user => {
       if (user) {
         document.getElementById('login-screen').classList.add('hidden');
@@ -206,7 +207,6 @@
       }
     });
 
-    // LOGIN & LOGOUT
     document.getElementById('login-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -220,7 +220,6 @@
 
     document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
-    // TAB SWITCHING
     function switchTab(tab) {
       if (tab === 'billing') {
         document.getElementById('section-billing').classList.remove('hidden');
@@ -241,7 +240,13 @@
       document.getElementById('prev-date').innerText = new Date().toLocaleDateString('en-IN');
     }
 
-    // BILLING LOGIC
+    function updatePreview() {
+      const name = document.getElementById('cust-name').value;
+      const mobile = document.getElementById('cust-mobile').value;
+      document.getElementById('prev-cust-name').innerText = name || 'Walk-in';
+      document.getElementById('prev-cust-mobile').innerText = mobile || 'N/A';
+    }
+
     function addItemToBill() {
       const name = document.getElementById('item-name').value;
       const price = parseFloat(document.getElementById('item-price').value);
@@ -261,6 +266,10 @@
       const prevBody = document.getElementById('prev-items-body');
       body.innerHTML = '';
       prevBody.innerHTML = '';
+
+      if (currentBillItems.length === 0) {
+        prevBody.innerHTML = `<tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>`;
+      }
 
       let grandTotal = 0;
       currentBillItems.forEach((item, idx) => {
@@ -286,8 +295,7 @@
 
       document.getElementById('bill-grand-total').innerText = grandTotal;
       document.getElementById('prev-total').innerText = grandTotal;
-      document.getElementById('prev-cust-name').innerText = document.getElementById('cust-name').value;
-      document.getElementById('prev-cust-mobile').innerText = document.getElementById('cust-mobile').value;
+      updatePreview();
     }
 
     function removeItem(idx) {
@@ -295,7 +303,16 @@
       renderBillItems();
     }
 
-    // SUBMIT & AUTO SYNC TO GOOGLE SHEETS AND EMAIL
+    function printBillDirect() {
+      if (currentBillItems.length === 0) return alert('Please add items to print the bill!');
+      const printContents = document.getElementById('invoice-preview').innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = `<div style="padding: 20px; max-width: 400px; margin: auto;">${printContents}</div>`;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    }
+
     async function submitAndPrintBill() {
       if (currentBillItems.length === 0) return alert('Bill is empty!');
       
@@ -313,19 +330,19 @@
         // Save to Firebase
         await db.collection('bills').add(invoiceData);
 
-        // Auto Sync to Google Sheet & Trigger Emails via Webhook
-        fetch(GOOGLE_APPS_SCRIPT_URL, {
+        // Send to Google Sheets via Apps Script with proper CORS handling
+        await fetch(GOOGLE_APPS_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(invoiceData)
         });
 
-        // PDF Auto Download
-        const element = document.getElementById('invoice-preview');
-        html2pdf().from(element).save(`${invoiceData.invoiceNo}.pdf`);
+        alert('Bill Generated Successfully & Synced to Google Sheet & Email!');
+        
+        // Direct Print Trigger
+        printBillDirect();
 
-        alert('Bill Generated Successfully! Auto-synced to Google Sheet & Emails.');
         currentBillItems = [];
         document.getElementById('cust-name').value = '';
         document.getElementById('cust-mobile').value = '';
@@ -336,7 +353,6 @@
       }
     }
 
-    // INVENTORY MANAGEMENT
     function loadInventory() {
       db.collection('inventory').onSnapshot(snapshot => {
         const body = document.getElementById('inventory-table-body');

@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anaya Automobiles - Billing & Inventory Dashboard</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase App & Firestore -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -37,7 +35,6 @@
 
   <!-- DASHBOARD MAIN CONTAINER -->
   <div id="dashboard-screen" class="hidden min-h-screen flex flex-col">
-    <!-- TOP NAVIGATION BAR -->
     <header class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center">
       <div>
         <h1 class="text-xl font-bold">Anaya Automobiles</h1>
@@ -52,6 +49,7 @@
     <!-- NAVIGATION TABS -->
     <nav class="bg-white border-b border-gray-200 px-4 flex space-x-4">
       <button onclick="switchTab('billing')" id="tab-billing" class="py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium">Billing Counter</button>
+      <button onclick="switchTab('history')" id="tab-history" class="py-3 px-4 text-gray-600 font-medium">Bill History & Reports</button>
       <button onclick="switchTab('inventory')" id="tab-inventory" class="py-3 px-4 text-gray-600 font-medium">Inventory / Stock</button>
     </nav>
 
@@ -60,9 +58,11 @@
       
       <!-- BILLING TAB CONTENT -->
       <section id="section-billing" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- BILL FORM -->
         <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow space-y-4">
-          <h2 class="text-lg font-bold border-b pb-2 text-gray-700">New Bill Generator</h2>
+          <div class="flex justify-between items-center border-b pb-2">
+            <h2 class="text-lg font-bold text-gray-700">New Bill Generator</h2>
+            <span id="badge-mode" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Creating New Bill</span>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -72,6 +72,14 @@
             <div>
               <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
               <input type="text" id="cust-mobile" oninput="updatePreview()" class="w-full mt-1 p-2 border rounded">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Vehicle Model</label>
+              <input type="text" id="vehicle-model" oninput="updatePreview()" placeholder="e.g. Splendor / Activa" class="w-full mt-1 p-2 border rounded">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Vehicle Number</label>
+              <input type="text" id="vehicle-no" oninput="updatePreview()" placeholder="e.g. MP21AB1234" class="w-full mt-1 p-2 border rounded">
             </div>
           </div>
 
@@ -105,8 +113,10 @@
               <label class="text-sm font-medium text-gray-700 mr-2">Payment Mode:</label>
               <select id="payment-mode" class="p-2 border rounded">
                 <option value="Cash">Cash</option>
-                <option value="Online / UPI">Online / UPI</option>
-                <option value="Udhaar / Credit">Udhaar / Credit</option>
+                <option value="UPI - Ayush">UPI - Ayush</option>
+                <option value="UPI - Ankur">UPI - Ankur</option>
+                <option value="UPI - Anaya automobiles">UPI - Anaya automobiles</option>
+                <option value="Udhaar">Udhaar</option>
               </select>
             </div>
             <div class="text-right">
@@ -114,23 +124,27 @@
             </div>
           </div>
 
-          <button onclick="submitAndPrintBill()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow">Generate & Save Bill (Auto-Sync)</button>
+          <div class="flex gap-2">
+            <button onclick="saveAndPrintBill()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow">Save & Print Bill</button>
+            <button onclick="resetBillingForm()" id="cancel-edit-btn" class="hidden bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded shadow">Cancel Edit</button>
+          </div>
         </div>
 
-        <!-- LIVE BILL PREVIEW & PRINT -->
+        <!-- LIVE BILL PREVIEW -->
         <div class="bg-white p-6 rounded-lg shadow flex flex-col justify-between">
           <div>
             <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
-            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-3">
+            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-2">
               <div class="text-center border-b pb-2">
                 <h1 class="text-base font-bold uppercase">Anaya Automobiles</h1>
                 <p>Katni, Madhya Pradesh - 483770</p>
-                <p id="prev-inv-no" class="font-semibold mt-1"></p>
+                <p id="prev-inv-no" class="font-semibold mt-1 text-blue-600"></p>
                 <p id="prev-date"></p>
               </div>
               <div>
                 <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
                 <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
+                <p><strong>Vehicle:</strong> <span id="prev-vehicle-model">-</span> (<span id="prev-vehicle-no">-</span>)</p>
               </div>
               <table class="w-full border-collapse border border-gray-300 text-xs">
                 <thead>
@@ -145,12 +159,46 @@
                   <tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>
                 </tbody>
               </table>
-              <div class="text-right font-bold text-sm pt-2">
-                <p>Grand Total: ₹<span id="prev-total">0</span></p>
+              <div class="flex justify-between pt-1">
+                <span class="font-semibold">Payment: <span id="prev-pay-mode">Cash</span></span>
+                <span class="font-bold text-sm">Grand Total: ₹<span id="prev-total">0</span></span>
               </div>
             </div>
           </div>
-          <button onclick="printBillDirect()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded shadow text-sm">🖨️ Print Bill / Save PDF</button>
+          <button onclick="printCurrentPreview()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded shadow text-sm">🖨️ Quick Print</button>
+        </div>
+      </section>
+
+      <!-- BILL HISTORY & REPORTS TAB -->
+      <section id="section-history" class="hidden bg-white p-6 rounded-lg shadow space-y-4">
+        <div class="flex flex-col md:flex-row justify-between items-center border-b pb-3 gap-3">
+          <h2 class="text-lg font-bold text-gray-700">Bill History & Reports</h2>
+          <div class="flex items-center gap-2">
+            <select id="filter-type" onchange="filterBills()" class="p-2 border rounded text-sm">
+              <option value="all">All Bills</option>
+              <option value="daily">Today's Bills (Daily)</option>
+              <option value="weekly">This Week</option>
+              <option value="monthly">This Month</option>
+            </select>
+            <input type="text" id="search-query" oninput="filterBills()" placeholder="Search Name/Mobile/No..." class="p-2 border rounded text-sm">
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse border border-gray-200 text-sm">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border p-2">Invoice #</th>
+                <th class="border p-2">Date</th>
+                <th class="border p-2">Customer</th>
+                <th class="border p-2">Vehicle</th>
+                <th class="border p-2">Items</th>
+                <th class="border p-2">Total (₹)</th>
+                <th class="border p-2">Mode</th>
+                <th class="border p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
         </div>
       </section>
 
@@ -193,6 +241,8 @@
     const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwnTgtEP4TTymQbgyQYW4zoDFAm_UnulFuyjm3PzPQf8Inq804x-8TRvdQ0euKUqcSzQ/exec";
 
     let currentBillItems = [];
+    let allBillsCache = [];
+    let editingDocId = null;
 
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -200,7 +250,8 @@
         document.getElementById('dashboard-screen').classList.remove('hidden');
         document.getElementById('user-display').innerText = user.email;
         loadInventory();
-        initNewInvoice();
+        loadBillHistory();
+        if(!editingDocId) initNewInvoice();
       } else {
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('dashboard-screen').classList.add('hidden');
@@ -221,31 +272,32 @@
     document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
     function switchTab(tab) {
-      if (tab === 'billing') {
-        document.getElementById('section-billing').classList.remove('hidden');
-        document.getElementById('section-inventory').classList.add('hidden');
-        document.getElementById('tab-billing').className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium";
-        document.getElementById('tab-inventory').className = "py-3 px-4 text-gray-600 font-medium";
-      } else {
-        document.getElementById('section-billing').classList.add('hidden');
-        document.getElementById('section-inventory').classList.remove('hidden');
-        document.getElementById('tab-inventory').className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium";
-        document.getElementById('tab-billing').className = "py-3 px-4 text-gray-600 font-medium";
-      }
+      ['billing', 'history', 'inventory'].forEach(t => {
+        document.getElementById(`section-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = "py-3 px-4 text-gray-600 font-medium";
+      });
+      document.getElementById(`section-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium";
+      if(tab === 'history') loadBillHistory();
     }
 
-    function initNewInvoice() {
-      const invNo = "INV-" + Math.floor(100000 + Math.random() * 900000);
-      document.getElementById('prev-inv-no').innerText = invNo;
+    async function initNewInvoice() {
+      if (editingDocId) return;
+      const snapshot = await db.collection('bills').get();
+      const seqNo = 1001 + snapshot.size;
+      document.getElementById('prev-inv-no').innerText = "INV-" + seqNo;
       document.getElementById('prev-date').innerText = new Date().toLocaleDateString('en-IN');
     }
 
     function updatePreview() {
-      const name = document.getElementById('cust-name').value;
-      const mobile = document.getElementById('cust-mobile').value;
-      document.getElementById('prev-cust-name').innerText = name || 'Walk-in';
-      document.getElementById('prev-cust-mobile').innerText = mobile || 'N/A';
+      document.getElementById('prev-cust-name').innerText = document.getElementById('cust-name').value || 'Walk-in';
+      document.getElementById('prev-cust-mobile').innerText = document.getElementById('cust-mobile').value || 'N/A';
+      document.getElementById('prev-vehicle-model').innerText = document.getElementById('vehicle-model').value || '-';
+      document.getElementById('prev-vehicle-no').innerText = document.getElementById('vehicle-no').value || '-';
+      document.getElementById('prev-pay-mode').innerText = document.getElementById('payment-mode').value;
     }
+
+    document.getElementById('payment-mode').addEventListener('change', updatePreview);
 
     function addItemToBill() {
       const name = document.getElementById('item-name').value;
@@ -303,8 +355,8 @@
       renderBillItems();
     }
 
-    function printBillDirect() {
-      if (currentBillItems.length === 0) return alert('Please add items to print the bill!');
+    function printCurrentPreview() {
+      if (currentBillItems.length === 0) return alert('Please add items to print!');
       const printContents = document.getElementById('invoice-preview').innerHTML;
       const originalContents = document.body.innerHTML;
       document.body.innerHTML = `<div style="padding: 20px; max-width: 400px; margin: auto;">${printContents}</div>`;
@@ -313,43 +365,147 @@
       location.reload();
     }
 
-    async function submitAndPrintBill() {
+    async function saveAndPrintBill() {
       if (currentBillItems.length === 0) return alert('Bill is empty!');
       
       const invoiceData = {
         invoiceNo: document.getElementById('prev-inv-no').innerText,
         date: document.getElementById('prev-date').innerText,
+        timestamp: new Date().getTime(),
         customerName: document.getElementById('cust-name').value || 'Walk-in Customer',
         mobile: document.getElementById('cust-mobile').value || 'N/A',
+        vehicleModel: document.getElementById('vehicle-model').value || 'N/A',
+        vehicleNo: document.getElementById('vehicle-no').value || 'N/A',
+        items: currentBillItems,
         itemsSummary: currentBillItems.map(i => `${i.name} (${i.qty} x ₹${i.price})`).join(', '),
         totalAmount: document.getElementById('bill-grand-total').innerText,
         paymentMode: document.getElementById('payment-mode').value
       };
 
       try {
-        // Save to Firebase
-        await db.collection('bills').add(invoiceData);
+        if (editingDocId) {
+          await db.collection('bills').doc(editingDocId).update(invoiceData);
+          alert('Bill Updated Successfully!');
+        } else {
+          await db.collection('bills').add(invoiceData);
+          fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(invoiceData)
+          });
+          alert('Bill Saved & Synced Successfully!');
+        }
 
-        // Send to Google Sheets via Apps Script with proper CORS handling
-        await fetch(GOOGLE_APPS_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(invoiceData)
-        });
-
-        alert('Bill Generated Successfully & Synced to Google Sheet & Email!');
-        
-        // Direct Print Trigger
-        printBillDirect();
-
-        currentBillItems = [];
-        document.getElementById('cust-name').value = '';
-        document.getElementById('cust-mobile').value = '';
-        renderBillItems();
-        initNewInvoice();
+        printCurrentPreview();
+        resetBillingForm();
       } catch (err) {
         alert('Error: ' + err.message);
+      }
+    }
+
+    function resetBillingForm() {
+      editingDocId = null;
+      currentBillItems = [];
+      document.getElementById('cust-name').value = '';
+      document.getElementById('cust-mobile').value = '';
+      document.getElementById('vehicle-model').value = '';
+      document.getElementById('vehicle-no').value = '';
+      document.getElementById('badge-mode').innerText = "Creating New Bill";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      renderBillItems();
+      initNewInvoice();
+    }
+
+    async function loadBillHistory() {
+      const snapshot = await db.collection('bills').orderBy('timestamp', 'desc').get();
+      allBillsCache = [];
+      snapshot.forEach(doc => {
+        allBillsCache.push({ id: doc.id, ...doc.data() });
+      });
+      renderHistoryTable(allBillsCache);
+    }
+
+    function renderHistoryTable(bills) {
+      const body = document.getElementById('history-table-body');
+      body.innerHTML = '';
+      if (bills.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-gray-400">No bills found</td></tr>`;
+        return;
+      }
+      bills.forEach(bill => {
+        body.innerHTML += `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="border p-2 font-semibold text-blue-600">${bill.invoiceNo}</td>
+            <td class="border p-2 text-xs">${bill.date}</td>
+            <td class="border p-2">${bill.customerName}<br><span class="text-xs text-gray-500">${bill.mobile}</span></td>
+            <td class="border p-2 text-xs">${bill.vehicleModel}<br>${bill.vehicleNo}</td>
+            <td class="border p-2 text-xs">${bill.itemsSummary}</td>
+            <td class="border p-2 font-bold">₹${bill.totalAmount}</td>
+            <td class="border p-2 text-xs">${bill.paymentMode}</td>
+            <td class="border p-2 space-x-1 whitespace-nowrap">
+              <button onclick="editBill('${bill.id}')" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">Edit</button>
+              <button onclick="deleteBill('${bill.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterBills() {
+      const type = document.getElementById('filter-type').value;
+      const query = document.getElementById('search-query').value.toLowerCase();
+      const now = new Date();
+
+      let filtered = allBillsCache.filter(bill => {
+        const matchesQuery = bill.customerName.toLowerCase().includes(query) || 
+                             bill.mobile.toLowerCase().includes(query) || 
+                             bill.invoiceNo.toLowerCase().includes(query) || 
+                             bill.vehicleNo.toLowerCase().includes(query);
+        if (!matchesQuery) return false;
+
+        if (type === 'daily') {
+          return bill.date === now.toLocaleDateString('en-IN');
+        } else if (type === 'weekly') {
+          const billDate = new Date(bill.timestamp);
+          const diffTime = Math.abs(now - billDate);
+          const diffDays = diffTime / (1000 * 60 * 60 * 24);
+          return diffDays <= 7;
+        } else if (type === 'monthly') {
+          const billDate = new Date(bill.timestamp);
+          return billDate.getMonth() === now.getMonth() && billDate.getFullYear() === now.getFullYear();
+        }
+        return true;
+      });
+
+      renderHistoryTable(filtered);
+    }
+
+    async function editBill(id) {
+      const bill = allBillsCache.find(b => b.id === id);
+      if (!bill) return;
+
+      editingDocId = bill.id;
+      document.getElementById('prev-inv-no').innerText = bill.invoiceNo;
+      document.getElementById('prev-date').innerText = bill.date;
+      document.getElementById('cust-name').value = bill.customerName;
+      document.getElementById('cust-mobile').value = bill.mobile;
+      document.getElementById('vehicle-model').value = bill.vehicleModel || '';
+      document.getElementById('vehicle-no').value = bill.vehicleNo || '';
+      document.getElementById('payment-mode').value = bill.paymentMode || 'Cash';
+      currentBillItems = bill.items || [];
+
+      document.getElementById('badge-mode').innerText = `Editing: ${bill.invoiceNo}`;
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+      switchTab('billing');
+      renderBillItems();
+    }
+
+    async function deleteBill(id) {
+      if (confirm('Are you sure you want to delete this bill?')) {
+        await db.collection('bills').doc(id).delete();
+        loadBillHistory();
       }
     }
 

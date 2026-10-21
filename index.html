@@ -40,7 +40,7 @@
   <form id="login-form" class="space-y-4">
    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Email ID</label><input id="login-email" type="email" required class="field" value="anayaautomobiles.tmp@gmail.com"></div>
    <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label><input id="login-password" type="password" required class="field" placeholder="Enter password"></div>
-   <button class="btn btn-primary w-full mt-2 py-3 font-bold" type="submit">Secure Login →</button>
+   <button id="login-btn" class="btn btn-primary w-full mt-2 py-3 font-bold" type="submit">Secure Login →</button>
   </form>
   <p id="login-error" class="text-sm text-red-600 mt-4 text-center font-medium hidden bg-red-50 p-3 rounded-lg border border-red-100"></p>
  </div>
@@ -218,9 +218,6 @@ const GOOGLE_APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbziIU6H-dA
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.firestore();
 
-// ENSURE AUTH PERSISTENCE IS LOCAL TO AVOID SESSION DROPS
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.error("Persistence error:", err));
-
 let currentBillItems=[],allBillsCache=[],inventoryCache=[],editingDocId=null,editingOriginal=null,inventoryUnsub=null,billsUnsub=null,reservedInvoiceNo=null;
 const $=id=>document.getElementById(id),money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),todayKey=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`},today=todayKey(new Date());
 
@@ -233,12 +230,14 @@ document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',(
 auth.onAuthStateChanged(user=>{
   const errEl=$('login-error');
   if(user){
+    console.log("Logged in user:", user.email);
     if(errEl) errEl.classList.add('hidden');
     $('login-screen').classList.add('hidden');
     $('dashboard-screen').classList.remove('hidden');$('user-display').textContent=user.email||'Anaya Admin';
     startListeners();
     resetBillingForm();
   }else{
+    console.log("User logged out or not authenticated");
     $('login-screen').classList.remove('hidden');$('dashboard-screen').classList.add('hidden');
     if(billsUnsub)billsUnsub();
     if(inventoryUnsub)inventoryUnsub();
@@ -248,14 +247,27 @@ auth.onAuthStateChanged(user=>{
 $('login-form').addEventListener('submit',async e=>{
   e.preventDefault();
   const errEl=$('login-error');
+  const loginBtn=$('login-btn');
   errEl.classList.add('hidden');
+  
   const email=$('login-email').value.trim();
   const pass=$('login-password').value;
+  
+  loginBtn.disabled=true;
+  loginBtn.textContent="Logging in...";
+  
   try{
+    console.log("Attempting sign in for:", email);
     await auth.signInWithEmailAndPassword(email,pass);
+    console.log("Sign in successful!");
   }catch(err){
+    console.error("Login Error Code:", err.code);
+    console.error("Login Error Message:", err.message);
     errEl.textContent="Login Failed: " + err.message;
     errEl.classList.remove('hidden');
+  }finally{
+    loginBtn.disabled=false;
+    loginBtn.textContent="Secure Login →";
   }
 });
 
@@ -284,9 +296,9 @@ async function syncBackup(payload,action='upsert'){try{await fetch(GOOGLE_APPS_S
 $('save-print-btn').onclick=async()=>{if(!currentBillItems.length){alert('Add items to bill');return}const btn=$('save-print-btn');btn.disabled=true;btn.textContent='Saving & Processing...';try{let payload=invoicePayload();if(editingDocId){await db.collection('bills').doc(editingDocId).update(payload);await syncBackup(payload,'upsert');alert('Bill updated successfully!')}else{const invoiceNo=reservedInvoiceNo||await getNextInvoiceNo();payload.invoiceNo=invoiceNo;$('prev-inv-no').textContent=invoiceNo;await db.collection('bills').doc(invoiceNo).set(payload);await syncBackup(payload,'upsert');alert('Bill saved, sheet synced & 4 emails triggered successfully!')}setTab('history');printInvoice(payload);await resetBillingForm()}catch(e){alert('Error: '+e.message)}finally{btn.disabled=false;btn.textContent='💾 Save, Sync Sheet & Email'}};
 function printInvoice(data){const items=(data.items||[]).map(i=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(data.total??i.total??i.price*i.qty)}</td></tr>`).join('');$('print-root').innerHTML=`<div class="invoice-paper p-6 max-w-3xl mx-auto"><div class="text-center border-b-2 border-slate-800 pb-3"><div style="font-size:24px;font-weight:900">ANAYA AUTOMOBILES</div><div style="font-weight:bold;letter-spacing:3px">CAR MARKET</div><p>Amarpur Road, Barhi</p><p>Mo: 9893931743 · 7999367203</p></div><div style="display:flex;justify-content:space-between;margin:15px 0"><div><p><b>Customer:</b> ${escapeHtml(data.customerName)}</p><p><b>Mobile:</b> ${escapeHtml(data.mobile)}</p><p><b>Vehicle:</b> ${escapeHtml(data.vehicleModel)}</p></div><div style="text-align:right"><p><b>Invoice:</b> ${escapeHtml(data.invoiceNo)}</p><p><b>Date:</b> ${escapeHtml(data.date)}</p><p><b>Vehicle No:</b> ${escapeHtml(data.vehicleNo)}</p></div></div><div class="watermark-table"><table style="min-width:0"><thead><tr><th>Item</th><th>Rate</th><th>Qty</th><th>Total</th></tr></thead><tbody>${items}</tbody></table></div><div style="margin-top:15px;border-top:1px solid #ddd;padding-top:8px"><p style="display:flex;justify-content:space-between"><span>Subtotal</span><b>${money(data.subtotal)}</b></p><p style="display:flex;justify-content:space-between"><span>Discount</span><b>${money(data.discount)}</b></p><p style="display:flex;justify-content:space-between;font-size:16px;border-top:1px solid #ddd;padding-top:6px"><b>Grand Total</b><b>${money(data.totalAmount)}</b></p><p><b>Payment:</b> ${escapeHtml(data.paymentMode)}</p></div><div style="display:flex;justify-content:space-between;align-items:end;margin-top:40px"><b>Thank you! Visit again 🙏</b><div style="border-top:1px solid #444;padding-top:4px">Authorised Signatory</div></div></div>`;$('print-root').classList.remove('hidden');setTimeout(()=>{window.print();$('print-root').classList.add('hidden')},100)}$('quick-print-btn').onclick=()=>{if(!currentBillItems.length){alert('Add items first');return}printInvoice(invoicePayload())};
 function renderHistoryTable(bills){const body=$('history-table-body');if(!bills.length){body.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">No bills found</td></tr>';return}body.innerHTML=bills.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date)}</td><td>${escapeHtml(b.customerName)}<br><span class="text-xs text-slate-500">${escapeHtml(b.mobile)}</span></td><td>${escapeHtml(b.vehicleModel)}<br><span class="text-xs text-slate-500">${escapeHtml(b.vehicleNo)}</span></td><td class="max-w-xs">${escapeHtml(b.itemsSummary||'')}</td><td class="font-bold">${money(b.totalAmount)}</td><td>${escapeHtml(b.paymentMode)}</td><td><div class="flex gap-1.5"><button class="btn btn-light" style="padding:5px 8px" onclick="editBill('${b.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteBill('${b.id}')">Delete</button></div></td></tr>`).join('')}
-function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp\vert{}\vert{}0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v\vert{}\vert{}'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
+function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v||'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
 $('filter-type').onchange=filterBills;$('search-query').oninput=filterBills;
-window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile\vert{}\vert{}'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo\vert{}\vert{}'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)\vert{}\vert{}0;currentBillItems=(b.items\vert{}\vert{}[]).map(i=>({...i,price:Number(i.price)\vert{}\vert{}0,qty:Number(i.qty)\vert{}\vert{}1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.remove('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
+window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile||'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo||'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)||0;currentBillItems=(b.items||[]).map(i=>({...i,price:Number(i.price)||0,qty:Number(i.qty)||1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.add('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
 window.deleteBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b||!confirm(`Delete ${b.invoiceNo}?`))return;try{await db.collection('bills').doc(id).delete();await syncBackup({invoiceNo:b.invoiceNo,deletedAt:Date.now()},'delete')}catch(e){alert(e.message)}};
 function renderDashboard(){const sum=arr=>arr.reduce((s,b)=>s+Number(b.totalAmount||0),0),todayBills=allBillsCache.filter(b=>todayKey(b.timestamp||0)===today),monthBills=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0);return d.getMonth()===new Date().getMonth()&&d.getFullYear()===new Date().getFullYear()});$('stat-today').textContent=money(sum(todayBills));$('stat-today-count').textContent=todayBills.length+' bills today';$('stat-month').textContent=money(sum(monthBills));$('stat-bills').textContent=allBillsCache.length;$('stat-stock').textContent=inventoryCache.length;const recent=allBillsCache.slice(0,6);$('recent-bills').innerHTML=recent.length?recent.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date||'')}</td><td>${escapeHtml(b.customerName||'')}</td><td>${escapeHtml(b.paymentMode||'')}</td><td class="font-bold">${money(b.totalAmount)}</td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-slate-400 py-6">No bills saved yet</td></tr>'}
 function renderInventory(){const body=$('inventory-table-body');$('inventory-count').textContent=inventoryCache.length;$('inventory-units').textContent=inventoryCache.reduce((s,i)=>s+Math.max(0,Number(i.stock)||0),0);$('inventory-low').textContent=inventoryCache.filter(i=>Number(i.stock)<=5).length;body.innerHTML=inventoryCache.length?inventoryCache.map(i=>`<tr><td class="font-semibold">${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><span class="${Number(i.stock)<=5?'text-red-600 font-bold':''}">${Number(i.stock)||0}</span></td><td><div class="flex gap-2"><button class="btn btn-light" style="padding:5px 8px" onclick="editStock('${i.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteStockItem('${i.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-slate-400 py-6">No inventory items</td></tr>'}

@@ -28,25 +28,8 @@
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="min-h-screen flex items-center justify-center p-4" style="background:radial-gradient(circle at top right,#1e3a8a,#0b1329 60%)">
- <div class="glass p-8 w-full max-w-md shadow-2xl">
-  <div class="text-center mb-8">
-   <div class="mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-lg" style="background:linear-gradient(135deg,#2563eb,#1d4ed8)">AA</div>
-   <h1 class="text-2xl font-black text-slate-900 tracking-tight">Anaya Automobiles</h1>
-   <p class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Car Market · Amarpur Road, Barhi</p>
-  </div>
-  <div class="space-y-4">
-   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Email ID</label><input id="login-email" type="email" class="field" value="anayaautomobiles.tmp@gmail.com"></div>
-   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label><input id="login-password" type="password" class="field" placeholder="Enter password (e.g. anaya123)"></div>
-   <button onclick="customLogin()" class="btn btn-primary w-full mt-2 py-3 font-bold cursor-pointer">Secure Login →</button>
-  </div>
-  <p id="login-error" class="text-sm text-red-600 mt-4 text-center font-medium hidden bg-red-50 p-3 rounded-lg border border-red-100"></p>
- </div>
-</div>
-
-<!-- DASHBOARD SCREEN -->
-<div id="dashboard-screen" class="hidden min-h-screen flex flex-col">
+<!-- DASHBOARD SCREEN (DIRECT OPEN) -->
+<div id="dashboard-screen" class="min-h-screen flex flex-col">
  <header class="text-white px-6 py-4 shadow-md" style="background:linear-gradient(110deg,#0b1329,#1e293b)">
   <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
    <div class="flex items-center gap-3.5">
@@ -57,8 +40,7 @@
     </div>
    </div>
    <div class="flex items-center gap-4">
-    <span id="user-display" class="hidden md:inline text-xs font-medium bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700"></span>
-    <button id="logout-btn" class="btn text-xs" style="background:rgba(255,255,255,0.08);color:white">Logout</button>
+    <span id="user-display" class="hidden md:inline text-xs font-medium bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700">Anaya Admin</span>
    </div>
   </div>
  </header>
@@ -93,7 +75,7 @@
      <div><h3 class="font-extrabold text-lg text-slate-900">Recent Transactions</h3><p class="text-xs text-slate-500">Latest 6 billing records</p></div>
      <button class="btn btn-light text-xs font-semibold" data-goto="history">View All History →</button>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer Name</th><th>Payment Mode</th><th>Total Amount</th></tr></thead><tbody id="recent-bills"></tbody></table></div>
+    <div class="table-wrap"><thead><tr><th>Invoice #</th><th>Date</th><th>Customer Name</th><th>Payment Mode</th><th>Total Amount</th></tr></thead><tbody id="recent-bills"></tbody></table></div>
    </div>
   </section>
 
@@ -203,7 +185,7 @@
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Units in Stock</p><p id="inventory-units" class="text-xl font-black text-slate-900 mt-1">0</p></div>
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Low Stock (≤ 5)</p><p id="inventory-low" class="text-xl font-black text-red-600 mt-1">0</p></div>
    </div>
-   <div class="table-wrap"><table><thead><tr><th>Item Name</th><th>Price (₹)</th><th>Available Stock</th><th>Actions</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
+   <div class="table-wrap"><thead><tr><th>Item Name</th><th>Price (₹)</th><th>Available Stock</th><th>Actions</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
   </section>
  </main>
 </div>
@@ -226,51 +208,11 @@ function setTab(tab){['dashboard','billing','history','inventory'].forEach(t=>{$
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 
-// Check existing login session on load
+// Direct start on load
 window.addEventListener('DOMContentLoaded', () => {
-  if(localStorage.getItem('anaya_logged_in') === 'true'){
-    openDashboard(localStorage.getItem('anaya_user') || 'Anaya Admin');
-  }
-});
-
-function openDashboard(userEmail){
-  $('login-screen').classList.add('hidden');
-  $('dashboard-screen').classList.remove('hidden');$('user-display').textContent = userEmail;
   startListeners();
   resetBillingForm();
-}
-
-// CUSTOM SECURE PASSWORD LOGIN (Bypasses Firebase Auth network/domain blocks)
-function customLogin(){
-  const email = $('login-email').value.trim();
-  const pass = $('login-password').value;
-  const errEl = $('login-error');
-  errEl.classList.add('hidden');
-
-  // Aap yahan apna password set kar sakte hain (default abhi 'anaya123' rakha hai)
-  const ADMIN_PASSWORD = "anaya123"; 
-
-  if(email === "anayaautomobiles.tmp@gmail.com" && pass === ADMIN_PASSWORD){
-    localStorage.setItem('anaya_logged_in', 'true');
-    localStorage.setItem('anaya_user', email);
-    openDashboard(email);
-  } else {
-    errEl.textContent = "Galat Email ID ya Password! (Default Password: anaya123)";
-    errEl.classList.remove('hidden');
-  }
-}
-
-document.getElementById('login-password').addEventListener('keypress', function(e){
-  if(e.key === 'Enter'){
-    customLogin();
-  }
 });
-
-$('logout-btn').onclick = () => {
-  localStorage.removeItem('anaya_logged_in');
-  localStorage.removeItem('anaya_user');
-  window.location.reload();
-};
 
 function startListeners(){
   if(billsUnsub)billsUnsub();
@@ -295,12 +237,12 @@ async function syncBackup(payload,action='upsert'){try{await fetch(GOOGLE_APPS_S
 $('save-print-btn').onclick=async()=>{if(!currentBillItems.length){alert('Add items to bill');return}const btn=$('save-print-btn');btn.disabled=true;btn.textContent='Saving & Processing...';try{let payload=invoicePayload();if(editingDocId){await db.collection('bills').doc(editingDocId).update(payload);await syncBackup(payload,'upsert');alert('Bill updated successfully!')}else{const invoiceNo=reservedInvoiceNo||await getNextInvoiceNo();payload.invoiceNo=invoiceNo;$('prev-inv-no').textContent=invoiceNo;await db.collection('bills').doc(invoiceNo).set(payload);await syncBackup(payload,'upsert');alert('Bill saved, sheet synced & 4 emails triggered successfully!')}setTab('history');printInvoice(payload);await resetBillingForm()}catch(e){alert('Error: '+e.message)}finally{btn.disabled=false;btn.textContent='💾 Save, Sync Sheet & Email'}};
 function printInvoice(data){const items=(data.items||[]).map(i=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(data.total??i.total??i.price*i.qty)}</td></tr>`).join('');$('print-root').innerHTML=`<div class="invoice-paper p-6 max-w-3xl mx-auto"><div class="text-center border-b-2 border-slate-800 pb-3"><div style="font-size:24px;font-weight:900">ANAYA AUTOMOBILES</div><div style="font-weight:bold;letter-spacing:3px">CAR MARKET</div><p>Amarpur Road, Barhi</p><p>Mo: 9893931743 · 7999367203</p></div><div style="display:flex;justify-content:space-between;margin:15px 0"><div><p><b>Customer:</b> ${escapeHtml(data.customerName)}</p><p><b>Mobile:</b> ${escapeHtml(data.mobile)}</p><p><b>Vehicle:</b> ${escapeHtml(data.vehicleModel)}</p></div><div style="text-align:right"><p><b>Invoice:</b> ${escapeHtml(data.invoiceNo)}</p><p><b>Date:</b> ${escapeHtml(data.date)}</p><p><b>Vehicle No:</b> ${escapeHtml(data.vehicleNo)}</p></div></div><div class="watermark-table"><table style="min-width:0"><thead><tr><th>Item</th><th>Rate</th><th>Qty</th><th>Total</th></tr></thead><tbody>${items}</tbody></table></div><div style="margin-top:15px;border-top:1px solid #ddd;padding-top:8px"><p style="display:flex;justify-content:space-between"><span>Subtotal</span><b>${money(data.subtotal)}</b></p><p style="display:flex;justify-content:space-between"><span>Discount</span><b>${money(data.discount)}</b></p><p style="display:flex;justify-content:space-between;font-size:16px;border-top:1px solid #ddd;padding-top:6px"><b>Grand Total</b><b>${money(data.totalAmount)}</b></p><p><b>Payment:</b> ${escapeHtml(data.paymentMode)}</p></div><div style="display:flex;justify-content:space-between;align-items:end;margin-top:40px"><b>Thank you! Visit again 🙏</b><div style="border-top:1px solid #444;padding-top:4px">Authorised Signatory</div></div></div>`;$('print-root').classList.remove('hidden');setTimeout(()=>{window.print();$('print-root').classList.add('hidden')},100)}$('quick-print-btn').onclick=()=>{if(!currentBillItems.length){alert('Add items first');return}printInvoice(invoicePayload())};
 function renderHistoryTable(bills){const body=$('history-table-body');if(!bills.length){body.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">No bills found</td></tr>';return}body.innerHTML=bills.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date)}</td><td>${escapeHtml(b.customerName)}<br><span class="text-xs text-slate-500">${escapeHtml(b.mobile)}</span></td><td>${escapeHtml(b.vehicleModel)}<br><span class="text-xs text-slate-500">${escapeHtml(b.vehicleNo)}</span></td><td class="max-w-xs">${escapeHtml(b.itemsSummary||'')}</td><td class="font-bold">${money(b.totalAmount)}</td><td>${escapeHtml(b.paymentMode)}</td><td><div class="flex gap-1.5"><button class="btn btn-light" style="padding:5px 8px" onclick="editBill('${b.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteBill('${b.id}')">Delete</button></div></td></tr>`).join('')}
-function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v||'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
+function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp\vert{}\vert{}0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v\vert{}\vert{}'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
 $('filter-type').onchange=filterBills;$('search-query').oninput=filterBills;
 window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile\vert{}\vert{}'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo\vert{}\vert{}'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)\vert{}\vert{}0;currentBillItems=(b.items\vert{}\vert{}[]).map(i=>({...i,price:Number(i.price)\vert{}\vert{}0,qty:Number(i.qty)\vert{}\vert{}1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.remove('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
 window.deleteBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b||!confirm(`Delete ${b.invoiceNo}?`))return;try{await db.collection('bills').doc(id).delete();await syncBackup({invoiceNo:b.invoiceNo,deletedAt:Date.now()},'delete')}catch(e){alert(e.message)}};
 function renderDashboard(){const sum=arr=>arr.reduce((s,b)=>s+Number(b.totalAmount||0),0),todayBills=allBillsCache.filter(b=>todayKey(b.timestamp||0)===today),monthBills=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0);return d.getMonth()===new Date().getMonth()&&d.getFullYear()===new Date().getFullYear()});$('stat-today').textContent=money(sum(todayBills));$('stat-today-count').textContent=todayBills.length+' bills today';$('stat-month').textContent=money(sum(monthBills));$('stat-bills').textContent=allBillsCache.length;$('stat-stock').textContent=inventoryCache.length;const recent=allBillsCache.slice(0,6);$('recent-bills').innerHTML=recent.length?recent.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date||'')}</td><td>${escapeHtml(b.customerName||'')}</td><td>${escapeHtml(b.paymentMode||'')}</td><td class="font-bold">${money(b.totalAmount)}</td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-slate-400 py-6">No bills saved yet</td></tr>'}
-function renderInventory(){const body=$('inventory-table-body');$('inventory-count').textContent=inventoryCache.length;$('inventory-units').textContent=inventoryCache.reduce((s,i)=>s+Math.max(0,Number(i.stock)||0),0);$('inventory-low').textContent=inventoryCache.filter(i=>Number(i.stock)<=5).length;body.innerHTML=inventoryCache.length?inventoryCache.map(i=>`<tr><td class="font-semibold">${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><span class="${Number(i.stock)<=5?'text-red-600 font-bold':''}">${Number(i.stock)||0}</span></td><td><div class="flex gap-2"><button class="btn btn-light" style="padding:5px 8px" onclick="editStock('${i.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteStockItem('${i.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-slate-400 py-6">No inventory items</td></tr>'}
+function renderInventory(){const body=$('inventory-table-body');$('inventory-count').textContent=inventoryCache.length;$('inventory-units').textContent=inventoryCache.reduce((s,i)=>s+Math.max(0,Number(i.stock)\vert{}\vert{}0),0);$('inventory-low').textContent=inventoryCache.filter(i=>Number(i.stock)<=5).length;body.innerHTML=inventoryCache.length?inventoryCache.map(i=>`<tr><td class="font-semibold">${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><span class="${Number(i.stock)<=5?'text-red-600 font-bold':''}">${Number(i.stock)||0}</span></td><td><div class="flex gap-2"><button class="btn btn-light" style="padding:5px 8px" onclick="editStock('${i.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteStockItem('${i.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-slate-400 py-6">No inventory items</td></tr>'}
 $('add-stock-btn').onclick=async()=>{const name=prompt('Item name:');if(!name?.trim())return;const price=prompt('Selling price (₹):','0');if(price===null)return;const stock=prompt('Opening stock quantity:','0');if(stock===null)return;try{await db.collection('inventory').add({name:name.trim(),price:Number(price),stock:Number(stock),updatedAt:Date.now()})}catch(e){alert(e.message)}};
 window.editStock=async id=>{const i=inventoryCache.find(x=>x.id===id);if(!i)return;const name=prompt('Item name:',i.name);if(name===null)return;const price=prompt('Price (₹):',i.price);if(price===null)return;const stock=prompt('Available stock:',i.stock);if(stock===null)return;try{await db.collection('inventory').doc(id).update({name:name.trim(),price:Number(price),stock:Number(stock),updatedAt:Date.now()})}catch(e){alert(e.message)}};
 window.deleteStockItem=async id=>{if(!confirm('Delete this stock item?'))return;try{await db.collection('inventory').doc(id).delete()}catch(e){alert(e.message)}};

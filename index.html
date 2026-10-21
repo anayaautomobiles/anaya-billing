@@ -107,7 +107,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Vehicle Model</label>
-              <input type="text" id="vehicle-model" oninput="updatePreview()" placeholder="e.g. Splendor / Activa" class="w-full mt-1 p-2 border rounded">
+              <input type="text" id="vehicle-model" oninput="updatePreview()" placeholder="e.g. Swift / Activa" class="w-full mt-1 p-2 border rounded">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Vehicle Number</label>
@@ -174,16 +174,17 @@
                 <p class="text-[10px] text-gray-600">Mo: 9893931743, 7999367203</p>
               </div>
 
-              <!-- CUSTOMER & INVOICE FORMAT -->
+              <!-- CUSTOMER & INVOICE LAYOUT -->
               <div class="flex justify-between items-start border-b pb-2 text-xs">
                 <div class="space-y-1">
                   <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
                   <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
-                  <p><strong>Vehicle:</strong> <span id="prev-vehicle-model">-</span> (<span id="prev-vehicle-no">-</span>)</p>
+                  <p><strong>Vehicle Model:</strong> <span id="prev-vehicle-model">-</span></p>
                 </div>
                 <div class="text-right space-y-1">
                   <p><strong>Invoice:</strong> <span id="prev-inv-no" class="font-semibold text-blue-600">INV-1001</span></p>
                   <p><strong>Date:</strong> <span id="prev-date"></span></p>
+                  <p><strong>Vehicle No:</strong> <span id="prev-vehicle-no">-</span></p>
                 </div>
               </div>
 

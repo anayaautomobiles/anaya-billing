@@ -3,11 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anaya Automobiles - Billing & Inventory Dashboard</title>
+  <title>Anaya Automobiles Car Market - Billing & Inventory Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <style>
+    .watermark-table {
+      position: relative;
+    }
+    .watermark-table::after {
+      content: "Anaya Automobiles Car Market";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-25deg);
+      font-size: 16px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.06);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen">
 
@@ -15,8 +33,8 @@
   <div id="login-screen" class="flex items-center justify-center min-h-screen bg-slate-900 px-4">
     <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
       <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">Anaya Automobiles</h1>
-        <p class="text-sm text-gray-500">Katni, MP (PIN: 483770)</p>
+        <h1 class="text-2xl font-bold text-slate-800">Anaya Automobiles Car Market</h1>
+        <p class="text-sm text-gray-500">Amarpur Road Barhi</p>
       </div>
       <form id="login-form" class="space-y-4">
         <div>
@@ -37,8 +55,8 @@
   <div id="dashboard-screen" class="hidden min-h-screen flex flex-col">
     <header class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center">
       <div>
-        <h1 class="text-xl font-bold">Anaya Automobiles</h1>
-        <p class="text-xs text-slate-300">Katni, Madhya Pradesh - 483770</p>
+        <h1 class="text-xl font-bold">Anaya Automobiles Car Market</h1>
+        <p class="text-xs text-slate-300">Amarpur Road Barhi | Mo: 9893931743, 7999367203</p>
       </div>
       <div class="flex items-center space-x-4">
         <span id="user-display" class="text-sm text-slate-300 hidden md:inline"></span>
@@ -136,8 +154,9 @@
             <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
             <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-2">
               <div class="text-center border-b pb-2">
-                <h1 class="text-base font-bold uppercase">Anaya Automobiles</h1>
-                <p>Katni, Madhya Pradesh - 483770</p>
+                <h1 class="text-base font-bold uppercase">Anaya Automobiles Car Market</h1>
+                <p>Amarpur Road Barhi</p>
+                <p class="text-[10px] text-gray-600">Mo: 9893931743, 7999367203</p>
                 <p id="prev-inv-no" class="font-semibold mt-1 text-blue-600"></p>
                 <p id="prev-date"></p>
               </div>
@@ -146,19 +165,21 @@
                 <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
                 <p><strong>Vehicle:</strong> <span id="prev-vehicle-model">-</span> (<span id="prev-vehicle-no">-</span>)</p>
               </div>
-              <table class="w-full border-collapse border border-gray-300 text-xs">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="border p-1">Item</th>
-                    <th class="border p-1">Price</th>
-                    <th class="border p-1">Qty</th>
-                    <th class="border p-1">Total</th>
-                  </tr>
-                </thead>
-                <tbody id="prev-items-body">
-                  <tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>
-                </tbody>
-              </table>
+              <div class="watermark-table">
+                <table class="w-full border-collapse border border-gray-300 text-xs relative z-10 bg-transparent">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="border p-1">Item</th>
+                      <th class="border p-1">Price</th>
+                      <th class="border p-1">Qty</th>
+                      <th class="border p-1">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="prev-items-body">
+                    <tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>
+                  </tbody>
+                </table>
+              </div>
               <div class="flex justify-between pt-1">
                 <span class="font-semibold">Payment: <span id="prev-pay-mode">Cash</span></span>
                 <span class="font-bold text-sm">Grand Total: ₹<span id="prev-total">0</span></span>

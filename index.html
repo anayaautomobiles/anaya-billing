@@ -1,609 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anaya Automobiles Car Market - Billing & Inventory Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <style>
-    .watermark-table {
-      position: relative;
-    }
-    /* DYNAMIC & PROFESSIONAL WATERMARK BADGE */
-    .watermark-table::after {
-      content: "ANAYA AUTOMOBILES\A CAR MARKET";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-12deg);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      color: rgba(30, 41, 59, 0.09);
-      text-align: center;
-      white-space: pre-wrap;
-      pointer-events: none;
-      z-index: 0;
-      border: 2px solid rgba(30, 41, 59, 0.09);
-      outline: 2px dashed rgba(30, 41, 59, 0.07);
-      outline-offset: 4px;
-      border-radius: 50%;
-      line-height: 1.25;
-      width: 145px;
-      height: 145px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
-    }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anaya Automobiles | Enterprise Billing & Inventory Suite</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--navy:#0b1329;--blue:#1d4ed8;--gold:#f59e0b;--accent:#3b82f6}
+*{box-sizing:border-box}body{background:#f8fafc;color:#0f172a;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.glass{background:rgba(255,255,255,.98);border:1px solid #e2e8f0;box-shadow:0 10px 25px -3px rgba(15,23,42,.05),0 4px 6px -4px rgba(15,23,42,.05);border-radius:16px}
+.btn{border-radius:10px;padding:10px 16px;font-weight:600;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--blue);color:white;box-shadow:0 4px 12px rgba(29,78,216,.25)}.btn-primary:hover{background:#1e40af;transform:translateY(-1px)}
+.btn-dark{background:var(--navy);color:white}.btn-dark:hover{background:#1e293b}
+.btn-light{background:#f1f5f9;color:#334155}.btn-light:hover{background:#e2e8f0}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fee2e2}.btn-danger:hover{background:#fee2e2}
+.field{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 14px;background:#fff;outline:none;transition:all .2s ease;font-size:14px}
+.field:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+.nav-btn{padding:10px 18px;border-radius:10px;font-weight:600;color:#64748b;white-space:nowrap;transition:all .2s ease}
+.nav-btn.active{background:#eff6ff;color:var(--blue);box-shadow:0 2px 6px rgba(37,99,235,.08)}
+.stat{border-radius:16px;padding:20px;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1px solid #e2e8f0;box-shadow:0 4px 6px -1px rgba(0,0,0,.02)}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f8fafc;font-weight:700}td,th{padding:14px;border-bottom:1px solid #f1f5f9;text-align:left}td{font-size:13px;color:#334155}
+.watermark-table{position:relative;isolation:isolate}.watermark-table:before{content:"ANAYA\\A AUTOMOBILES";white-space:pre;position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%) rotate(-22deg);z-index:-1;border:3px double rgba(37,99,235,.08);border-radius:50%;width:180px;height:180px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:18px;line-height:1.2;letter-spacing:2px;color:rgba(37,99,235,.08);pointer-events:none}
+.invoice-paper{position:relative;background:white;color:#0f172a;font-family:Arial,sans-serif}.invoice-paper:before{content:"ANAYA AUTOMOBILES";position:absolute;top:48%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);font-size:26px;font-weight:900;letter-spacing:3px;color:rgba(37,99,235,.06);white-space:nowrap;pointer-events:none}.invoice-paper>*{position:relative}
+@media print{body *{visibility:hidden!important}#print-root,#print-root *{visibility:visible!important}#print-root{position:absolute;left:0;top:0;width:100%;padding:0!important;margin:0!important}.invoice-paper{width:100%;border:0!important;box-shadow:none!important}.no-print{display:none!important}}
+</style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen">
+<body>
 
-  <!-- LOGIN CONTAINER -->
-  <div id="login-screen" class="flex items-center justify-center min-h-screen bg-slate-900 px-4">
-    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
-      <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">Anaya Automobiles Car Market</h1>
-        <p class="text-sm text-gray-500">Amarpur Road Barhi</p>
-      </div>
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Email ID</label>
-          <input type="email" id="login-email" required class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="login-password" required class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition duration-200">Login to Dashboard</button>
-      </form>
-      <p id="login-error" class="text-red-500 text-sm mt-3 text-center hidden"></p>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center p-4" style="background:radial-gradient(circle at top right,#1e3a8a,#0b1329 60%)">
+ <div class="glass p-8 w-full max-w-md shadow-2xl">
+  <div class="text-center mb-8">
+   <div class="mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-lg" style="background:linear-gradient(135deg,#2563eb,#1d4ed8)">AA</div>
+   <h1 class="text-2xl font-black text-slate-900 tracking-tight">Anaya Automobiles</h1>
+   <p class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Car Market · Amarpur Road, Barhi</p>
+  </div>
+  <form id="login-form" class="space-y-4">
+   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Email ID</label><input id="login-email" type="email" required class="field" autocomplete="username" placeholder="admin@anaya.com"></div>
+   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label><input id="login-password" type="password" required class="field" autocomplete="current-password" placeholder="••••••••"></div>
+   <button class="btn btn-primary w-full mt-2 py-3 font-bold" type="submit">Secure Login →</button>
+  </form>
+  <p id="login-error" class="text-sm text-red-600 mt-4 text-center font-medium hidden bg-red-50 p-3 rounded-lg border border-red-100"></p>
+ </div>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="dashboard-screen" class="hidden min-h-screen flex flex-col">
+ <header class="text-white px-6 py-4 shadow-md" style="background:linear-gradient(110deg,#0b1329,#1e293b)">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+   <div class="flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-xl shadow" style="background:var(--gold);color:#0b1329">AA</div>
+    <div>
+     <h1 class="font-black text-lg md:text-xl tracking-tight">Anaya Automobiles <span class="text-amber-400 font-medium text-sm">Car Market</span></h1>
+     <p class="text-xs text-slate-400 font-medium">Amarpur Road, Barhi · Mo: 9893931743, 7999367203</p>
     </div>
+   </div>
+   <div class="flex items-center gap-4">
+    <span id="user-display" class="hidden md:inline text-xs font-medium bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700"></span>
+    <button id="logout-btn" class="btn text-xs" style="background:rgba(255,255,255,0.08);color:white">Logout</button>
+   </div>
+  </div>
+ </header>
+
+ <main class="max-w-7xl mx-auto p-5 md:p-8 flex-grow w-full">
+  <!-- NAVIGATION TABS -->
+  <div class="flex gap-2 overflow-x-auto mb-6 bg-white p-1.5 rounded-2xl border border-slate-200 w-fit max-w-full shadow-sm">
+   <button class="nav-btn active" data-tab="dashboard">Overview</button>
+   <button class="nav-btn" data-tab="billing">Billing Counter</button>
+   <button class="nav-btn" data-tab="history">Bills & Reports</button>
+   <button class="nav-btn" data-tab="inventory">Inventory</button>
   </div>
 
-  <!-- DASHBOARD MAIN CONTAINER -->
-  <div id="dashboard-screen" class="hidden min-h-screen flex flex-col">
-    <header class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center">
-      <div>
-        <h1 class="text-xl font-bold">Anaya Automobiles Car Market</h1>
-        <p class="text-xs text-slate-300">Amarpur Road Barhi | Mo: 9893931743, 7999367203</p>
-      </div>
-      <div class="flex items-center space-x-4">
-        <span id="user-display" class="text-sm text-slate-300 hidden md:inline"></span>
-        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1.5 rounded">Logout</button>
-      </div>
-    </header>
+  <!-- OVERVIEW TAB -->
+  <section id="section-dashboard" class="space-y-6">
+   <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+    <div>
+     <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Executive Dashboard</p>
+     <h2 class="text-2xl font-black text-slate-900 mt-1">Welcome back, Admin 👋</h2>
+     <p class="text-slate-500 text-sm mt-0.5">Here is your live shop performance and billing summary.</p>
+    </div>
+    <button class="btn btn-primary" data-goto="billing">＋ Create New Bill</button>
+   </div>
 
-    <!-- NAVIGATION TABS -->
-    <nav class="bg-white border-b border-gray-200 px-4 flex space-x-4">
-      <button onclick="switchTab('billing')" id="tab-billing" class="py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium">Billing Counter</button>
-      <button onclick="switchTab('history')" id="tab-history" class="py-3 px-4 text-gray-600 font-medium">Bill History & Reports</button>
-      <button onclick="switchTab('inventory')" id="tab-inventory" class="py-3 px-4 text-gray-600 font-medium">Inventory / Stock</button>
-    </nav>
+   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div class="stat"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Sales</p><p id="stat-today" class="text-2xl font-black text-slate-900 mt-2">₹0</p><p id="stat-today-count" class="text-xs font-medium text-blue-600 mt-1">0 bills generated today</p></div>
+    <div class="stat"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">This Month's Sales</p><p id="stat-month" class="text-2xl font-black text-slate-900 mt-2">₹0</p><p class="text-xs font-medium text-slate-500 mt-1">Accumulated revenue</p></div>
+    <div class="stat"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Saved Bills</p><p id="stat-bills" class="text-2xl font-black text-slate-900 mt-2">0</p><p class="text-xs font-medium text-slate-500 mt-1">Synced with Firebase & Sheet</p></div>
+    <div class="stat"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Stock Items</p><p id="stat-stock" class="text-2xl font-black text-slate-900 mt-2">0</p><p class="text-xs font-medium text-slate-500 mt-1">Active inventory parts</p></div>
+   </div>
 
-    <!-- MAIN CONTENT AREA -->
-    <main class="p-6 flex-grow">
-      
-      <!-- BILLING TAB CONTENT -->
-      <section id="section-billing" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow space-y-4">
-          <div class="flex justify-between items-center border-b pb-2">
-            <h2 class="text-lg font-bold text-gray-700">New Bill Generator</h2>
-            <span id="badge-mode" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Creating New Bill</span>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-              <input type="text" id="cust-name" oninput="updatePreview()" class="w-full mt-1 p-2 border rounded">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Mobile Number</label>
-              <input type="text" id="cust-mobile" oninput="updatePreview()" class="w-full mt-1 p-2 border rounded">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Vehicle Model</label>
-              <input type="text" id="vehicle-model" oninput="updatePreview()" placeholder="e.g. Swift / Activa" class="w-full mt-1 p-2 border rounded">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Vehicle Number</label>
-              <input type="text" id="vehicle-no" oninput="updatePreview()" placeholder="e.g. MP21AB1234" class="w-full mt-1 p-2 border rounded">
-            </div>
-          </div>
+   <div class="glass p-6">
+    <div class="flex items-center justify-between gap-3 mb-5">
+     <div><h3 class="font-extrabold text-lg text-slate-900">Recent Transactions</h3><p class="text-xs text-slate-500">Latest 6 billing records</p></div>
+     <button class="btn btn-light text-xs font-semibold" data-goto="history">View All History →</button>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer Name</th><th>Payment Mode</th><th>Total Amount</th></tr></thead><tbody id="recent-bills"></tbody></table></div>
+   </div>
+  </section>
 
-          <!-- ADD ITEM SECTION -->
-          <div class="border p-4 rounded bg-slate-50 space-y-3">
-            <h3 class="text-sm font-semibold text-gray-600">Add Item</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-              <input type="text" id="item-name" placeholder="Part Name" class="p-2 border rounded md:col-span-2">
-              <input type="number" id="item-price" placeholder="Price (₹)" class="p-2 border rounded">
-              <input type="number" id="item-qty" placeholder="Qty" value="1" class="p-2 border rounded">
-            </div>
-            <button onclick="addItemToBill()" class="bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700">Add to List</button>
-          </div>
+  <!-- BILLING TAB -->
+  <section id="section-billing" class="hidden grid grid-cols-1 xl:grid-cols-5 gap-6">
+   <div class="glass p-6 xl:col-span-3 space-y-6">
+    <div class="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+     <div><p class="text-xs uppercase tracking-wider text-blue-600 font-extrabold">Point of Sale</p><h2 class="text-xl font-black text-slate-900 mt-0.5">New Tax Invoice</h2></div>
+     <span id="badge-mode" class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-700 font-bold border border-blue-100">NEW BILL</span>
+    </div>
 
-          <!-- ITEMS TABLE -->
-          <table class="w-full text-left border-collapse border border-gray-200 text-sm">
-            <thead>
-              <tr class="bg-gray-100">
-                <th class="border p-2">Item</th>
-                <th class="border p-2">Price</th>
-                <th class="border p-2">Qty</th>
-                <th class="border p-2">Total</th>
-                <th class="border p-2">Action</th>
-              </tr>
-            </thead>
-            <tbody id="bill-items-body"></tbody>
-          </table>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Customer Name</label><input id="cust-name" class="field" placeholder="Enter customer name"></div>
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Mobile Number</label><input id="cust-mobile" class="field" inputmode="numeric" maxlength="15" placeholder="10-digit mobile number"></div>
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Vehicle Model</label><input id="vehicle-model" class="field" placeholder="e.g. Swift / Scorpio"></div>
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Vehicle Number</label><input id="vehicle-no" class="field uppercase" placeholder="e.g. MP21AB1234"></div>
+    </div>
 
-          <div class="flex justify-between items-center pt-4 border-t">
-            <div>
-              <label class="text-sm font-medium text-gray-700 mr-2">Payment Mode:</label>
-              <select id="payment-mode" class="p-2 border rounded">
-                <option value="Cash">Cash</option>
-                <option value="UPI - Ayush">UPI - Ayush</option>
-                <option value="UPI - Ankur">UPI - Ankur</option>
-                <option value="UPI - Anaya automobiles">UPI - Anaya automobiles</option>
-                <option value="Udhaar">Udhaar</option>
-              </select>
-            </div>
-            <div class="text-right">
-              <span class="text-lg font-bold">Total: ₹<span id="bill-grand-total">0</span></span>
-            </div>
-          </div>
+    <div class="rounded-xl p-4 bg-slate-50 border border-slate-200/80 space-y-3">
+     <div class="flex justify-between items-center"><h3 class="font-bold text-sm text-slate-800">Add Spare Parts / Items</h3><span class="text-xs text-slate-500">Auto-suggests from inventory</span></div>
+     <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5">
+      <input id="item-name" list="inventory-options" class="field md:col-span-5" placeholder="Part name">
+      <datalist id="inventory-options"></datalist>
+      <input id="item-price" type="number" min="0" step="0.01" class="field md:col-span-3" placeholder="Price (₹)">
+      <input id="item-qty" type="number" min="1" step="1" value="1" class="field md:col-span-2" placeholder="Qty">
+      <button id="add-item-btn" class="btn btn-primary md:col-span-2 text-xs font-bold">Add</button>
+     </div>
+    </div>
 
-          <div class="flex gap-2">
-            <button onclick="saveAndPrintBill()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow">Save & Print Bill</button>
-            <button onclick="resetBillingForm()" id="cancel-edit-btn" class="hidden bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded shadow">Cancel Edit</button>
-          </div>
-        </div>
+    <div class="table-wrap rounded-xl border border-slate-200">
+     <table style="min-width:500px"><thead><tr><th>Part Name</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody id="bill-items-body"><tr><td colspan="5" class="text-center text-slate-400 py-6">No items added yet</td></tr></tbody></table>
+    </div>
 
-        <!-- LIVE BILL PREVIEW -->
-        <div class="bg-white p-6 rounded-lg shadow flex flex-col justify-between">
-          <div>
-            <h2 class="text-lg font-bold border-b pb-2 text-gray-700 mb-4">Print Preview</h2>
-            <div id="invoice-preview" class="border p-4 bg-white text-xs space-y-3">
-              <!-- HEADER -->
-              <div class="text-center border-b pb-2">
-                <h1 class="text-base font-bold uppercase">Anaya Automobiles Car Market</h1>
-                <p>Amarpur Road Barhi</p>
-                <p class="text-[10px] text-gray-600">Mo: 9893931743, 7999367203</p>
-              </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Payment Method</label><select id="payment-mode" class="field"><option>Cash</option><option>UPI - Ayush</option><option>UPI - Ankur</option><option>UPI - Anaya automobiles</option><option>Udhaar</option></select></div>
+     <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Discount (₹)</label><input id="bill-discount" class="field" type="number" min="0" step="0.01" value="0"></div>
+    </div>
 
-              <!-- CUSTOMER & INVOICE LAYOUT -->
-              <div class="flex justify-between items-start border-b pb-2 text-xs">
-                <div class="space-y-1">
-                  <p><strong>Customer:</strong> <span id="prev-cust-name">Walk-in</span></p>
-                  <p><strong>Mobile:</strong> <span id="prev-cust-mobile">N/A</span></p>
-                  <p><strong>Vehicle Model:</strong> <span id="prev-vehicle-model">-</span></p>
-                </div>
-                <div class="text-right space-y-1">
-                  <p><strong>Invoice:</strong> <span id="prev-inv-no" class="font-semibold text-blue-600">INV-1001</span></p>
-                  <p><strong>Date:</strong> <span id="prev-date"></span></p>
-                  <p><strong>Vehicle No:</strong> <span id="prev-vehicle-no">-</span></p>
-                </div>
-              </div>
+    <div class="rounded-xl p-4 text-white flex justify-between items-center shadow-lg" style="background:linear-gradient(135deg,#0b1329,#1e293b)">
+     <div><p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Grand Total</p><p class="text-xs text-slate-400 mt-0.5">Inclusive of all items & discount</p></div>
+     <p class="text-2xl font-black text-amber-400" id="bill-grand-total">₹0.00</p>
+    </div>
 
-              <!-- WATERMARK & TABLE -->
-              <div class="watermark-table my-2">
-                <table class="w-full border-collapse border border-gray-300 text-xs relative z-10 bg-transparent">
-                  <thead>
-                    <tr class="bg-gray-50">
-                      <th class="border p-1">Item</th>
-                      <th class="border p-1">Price</th>
-                      <th class="border p-1">Qty</th>
-                      <th class="border p-1">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody id="prev-items-body">
-                    <tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>
-                  </tbody>
-                </table>
-              </div>
+    <div class="flex flex-col sm:flex-row gap-3">
+     <button id="save-print-btn" class="btn btn-primary flex-1 py-3 font-bold text-sm">💾 Save, Sync Sheet & Email</button>
+     <button id="cancel-edit-btn" class="btn btn-light hidden">Cancel</button>
+     <button id="clear-form-btn" class="btn btn-light">Reset</button>
+    </div>
+    <p id="save-status" class="text-xs font-medium text-slate-500 text-center"></p>
+   </div>
 
-              <!-- TOTAL & PAYMENT -->
-              <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-semibold">Payment: <span id="prev-pay-mode">Cash</span></span>
-                <span class="font-bold text-sm">Grand Total: ₹<span id="prev-total">0</span></span>
-              </div>
+   <!-- LIVE PREVIEW PANEL -->
+   <div class="glass p-6 xl:col-span-2 h-fit">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+     <div><h3 class="font-extrabold text-slate-900">Live Invoice Preview</h3><p class="text-xs text-slate-500">Thermal / A4 Print Format</p></div>
+    </div>
+    <div id="invoice-preview" class="invoice-paper border border-slate-200 rounded-xl p-5 text-xs space-y-4 shadow-sm">
+     <div class="text-center border-b-2 border-slate-800 pb-3">
+      <div class="font-black text-lg tracking-tight uppercase">Anaya Automobiles</div>
+      <div class="font-bold text-[10px] tracking-[0.2em] mt-0.5 text-blue-700">CAR MARKET</div>
+      <p class="mt-1.5 text-slate-600">Amarpur Road, Barhi</p>
+      <p class="text-slate-600">Mo: 9893931743 · 7999367203</p>
+     </div>
+     <div class="flex justify-between gap-2 text-[11px]">
+      <div class="space-y-0.5"><p><b>Customer:</b> <span id="prev-cust-name">Walk-in</span></p><p><b>Mobile:</b> <span id="prev-cust-mobile">N/A</span></p><p><b>Vehicle:</b> <span id="prev-vehicle-model">-</span></p></div>
+      <div class="text-right space-y-0.5"><p><b>Invoice:</b> <span id="prev-inv-no" class="font-bold text-blue-600">INV-1001</span></p><p><b>Date:</b> <span id="prev-date"></span></p><p><b>Vehicle No:</b> <span id="prev-vehicle-no">-</span></p></div>
+     </div>
+     <div class="watermark-table">
+      <table style="min-width:0"><thead><tr><th style="padding:4px">Item</th><th style="padding:4px">Rate</th><th style="padding:4px">Qty</th><th style="padding:4px">Total</th></tr></thead><tbody id="prev-items-body"><tr><td colspan="4" class="text-center py-3 text-slate-400">No items yet</td></tr></tbody></table>
+     </div>
+     <div class="space-y-1.5 border-t border-slate-200 pt-2.5 text-[11px]">
+      <div class="flex justify-between"><span>Subtotal</span><span id="prev-subtotal">₹0.00</span></div>
+      <div class="flex justify-between"><span>Discount</span><span id="prev-discount">₹0.00</span></div>
+      <div class="flex justify-between font-black text-xs border-t pt-1.5 text-blue-700"><span>Grand Total</span><span id="prev-total">₹0.00</span></div>
+      <p class="pt-1"><b>Payment Mode:</b> <span id="prev-pay-mode">Cash</span></p>
+     </div>
+     <div class="flex justify-between items-end pt-4 border-t border-slate-100">
+      <p class="font-bold text-[11px] text-slate-700">Thank you! Visit again 🙏</p>
+      <div class="text-center"><div class="h-6"></div><p class="border-t border-slate-400 pt-0.5 text-[10px] text-slate-600">Authorised Signatory</p></div>
+     </div>
+    </div>
+    <button id="quick-print-btn" class="btn btn-dark w-full mt-4 py-2.5 font-bold text-xs">🖨️ Quick Print Preview</button>
+   </div>
+  </section>
 
-              <!-- MID CENTERED THANK YOU & SIGNATURE -->
-              <div class="pt-4 flex flex-col space-y-4">
-                <div class="text-center font-semibold text-slate-700 tracking-wide text-xs">
-                  <p>Thank You! Visit Again 🙏</p>
-                </div>
-                <div class="flex justify-end">
-                  <div class="text-center">
-                    <p class="border-t border-gray-400 px-3 pt-1 text-[10px] font-semibold text-gray-600">Authorised Signatory</p>
-                  </div>
-                </div>
-              </div>
+  <!-- HISTORY & REPORTS TAB -->
+  <section id="section-history" class="hidden glass p-6 space-y-5">
+   <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+    <div><h2 class="text-xl font-black text-slate-900">Bill History & Reports</h2><p class="text-sm text-slate-500">Filter, search, edit, or delete past invoices</p></div>
+    <div class="flex flex-col sm:flex-row gap-2.5">
+     <select id="filter-type" class="field"><option value="all">All Bills</option><option value="daily">Today's Bills</option><option value="weekly">Last 7 Days</option><option value="monthly">This Month</option></select>
+     <input id="search-query" class="field" placeholder="Search invoice, customer, mobile...">
+    </div>
+   </div>
+   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Filtered Sales</p><p id="filtered-sales" class="text-xl font-black text-slate-900 mt-1">₹0</p></div>
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Bills Shown</p><p id="filtered-count" class="text-xl font-black text-slate-900 mt-1">0</p></div>
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Udhaar Credit Total</p><p id="filtered-credit" class="text-xl font-black text-amber-600 mt-1">₹0</p></div>
+   </div>
+   <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer & Mobile</th><th>Vehicle Details</th><th>Items Summary</th><th>Total</th><th>Payment</th><th>Actions</th></tr></thead><tbody id="history-table-body"></tbody></table></div>
+  </section>
 
-            </div>
-          </div>
-          <button onclick="printCurrentPreview()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded shadow text-sm">🖨️ Quick Print</button>
-        </div>
-      </section>
+  <!-- INVENTORY TAB -->
+  <section id="section-inventory" class="hidden glass p-6 space-y-5">
+   <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-slate-100 pb-4">
+    <div><h2 class="text-xl font-black text-slate-900">Inventory Management</h2><p class="text-sm text-slate-500">Manage stock parts, pricing and availability</p></div>
+    <button id="add-stock-btn" class="btn btn-primary text-xs font-bold">＋ Add Inventory Item</button>
+   </div>
+   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Total Products</p><p id="inventory-count" class="text-xl font-black text-slate-900 mt-1">0</p></div>
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Units in Stock</p><p id="inventory-units" class="text-xl font-black text-slate-900 mt-1">0</p></div>
+    <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Low Stock (≤ 5)</p><p id="inventory-low" class="text-xl font-black text-red-600 mt-1">0</p></div>
+   </div>
+   <div class="table-wrap"><table><thead><tr><th>Item Name</th><th>Price (₹)</th><th>Available Stock</th><th>Actions</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
+  </section>
+ </main>
+</div>
 
-      <!-- BILL HISTORY & REPORTS TAB -->
-      <section id="section-history" class="hidden bg-white p-6 rounded-lg shadow space-y-4">
-        <div class="flex flex-col md:flex-row justify-between items-center border-b pb-3 gap-3">
-          <h2 class="text-lg font-bold text-gray-700">Bill History & Reports</h2>
-          <div class="flex items-center gap-2">
-            <select id="filter-type" onchange="filterBills()" class="p-2 border rounded text-sm">
-              <option value="all">All Bills</option>
-              <option value="daily">Today's Bills (Daily)</option>
-              <option value="weekly">This Week</option>
-              <option value="monthly">This Month</option>
-            </select>
-            <input type="text" id="search-query" oninput="filterBills()" placeholder="Search Name/Mobile/No..." class="p-2 border rounded text-sm">
-          </div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse border border-gray-200 text-sm">
-            <thead>
-              <tr class="bg-gray-100">
-                <th class="border p-2">Invoice #</th>
-                <th class="border p-2">Date</th>
-                <th class="border p-2">Customer</th>
-                <th class="border p-2">Vehicle</th>
-                <th class="border p-2">Items</th>
-                <th class="border p-2">Total (₹)</th>
-                <th class="border p-2">Mode</th>
-                <th class="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body"></tbody>
-          </table>
-        </div>
-      </section>
+<div id="print-root" class="hidden"></div>
 
-      <!-- INVENTORY TAB CONTENT -->
-      <section id="section-inventory" class="hidden bg-white p-6 rounded-lg shadow space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-          <h2 class="text-lg font-bold text-gray-700">Inventory Management</h2>
-          <button onclick="openAddStockModal()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm">+ Add New Item</button>
-        </div>
-        <table class="w-full text-left border-collapse border border-gray-200 text-sm">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="border p-2">Item Name</th>
-              <th class="border p-2">Price (₹)</th>
-              <th class="border p-2">Available Stock</th>
-              <th class="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="inventory-table-body"></tbody>
-        </table>
-      </section>
-
-    </main>
-  </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA2hfa5mGhR-gNfH_d33wnTCl90Yh62Ipc",
-      authDomain: "anaya-automobiles.firebaseapp.com",
-      projectId: "anaya-automobiles",
-      storageBucket: "anaya-automobiles.firebasestorage.app",
-      messagingSenderId: "823594933535",
-      appId: "1:823594933535:web:ac13ae7538013154c7642a"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Updated Google Apps Script Webhook URL with Version 7 deployment
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4ItbHvzYz4veHtNZozlYuxouuEm8uwwhc7cQPqpjMYxzQqaLljmfwbDzDU2TzAWkg-w/exec";
-
-    let currentBillItems = [];
-    let allBillsCache = [];
-    let editingDocId = null;
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.getElementById('user-display').innerText = user.email;
-        loadInventory();
-        loadBillHistory();
-        if(!editingDocId) initNewInvoice();
-      } else {
-        document.getElementById('login-screen').classList.remove('hidden');
-        document.getElementById('dashboard-screen').classList.add('hidden');
-      }
-    });
-
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pass = document.getElementById('login-password').value;
-      auth.signInWithEmailAndPassword(email, pass).catch(err => {
-        const errEl = document.getElementById('login-error');
-        errEl.innerText = err.message;
-        errEl.classList.remove('hidden');
-      });
-    });
-
-    document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-
-    function switchTab(tab) {
-      ['billing', 'history', 'inventory'].forEach(t => {
-        document.getElementById(`section-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = "py-3 px-4 text-gray-600 font-medium";
-      });
-      document.getElementById(`section-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 font-medium";
-      if(tab === 'history') loadBillHistory();
-    }
-
-    async function initNewInvoice() {
-      if (editingDocId) return;
-      const snapshot = await db.collection('bills').get();
-      const seqNo = 1001 + snapshot.size;
-      document.getElementById('prev-inv-no').innerText = "INV-" + seqNo;
-      document.getElementById('prev-date').innerText = new Date().toLocaleDateString('en-IN');
-    }
-
-    function updatePreview() {
-      document.getElementById('prev-cust-name').innerText = document.getElementById('cust-name').value || 'Walk-in';
-      document.getElementById('prev-cust-mobile').innerText = document.getElementById('cust-mobile').value || 'N/A';
-      document.getElementById('prev-vehicle-model').innerText = document.getElementById('vehicle-model').value || '-';
-      document.getElementById('prev-vehicle-no').innerText = document.getElementById('vehicle-no').value || '-';
-      document.getElementById('prev-pay-mode').innerText = document.getElementById('payment-mode').value;
-    }
-
-    document.getElementById('payment-mode').addEventListener('change', updatePreview);
-
-    function addItemToBill() {
-      const name = document.getElementById('item-name').value;
-      const price = parseFloat(document.getElementById('item-price').value);
-      const qty = parseInt(document.getElementById('item-qty').value);
-
-      if (!name || isNaN(price) || isNaN(qty)) return alert('Please enter valid item details!');
-
-      currentBillItems.push({ name, price, qty, total: price * qty });
-      document.getElementById('item-name').value = '';
-      document.getElementById('item-price').value = '';
-      document.getElementById('item-qty').value = '1';
-      renderBillItems();
-    }
-
-    function renderBillItems() {
-      const body = document.getElementById('bill-items-body');
-      const prevBody = document.getElementById('prev-items-body');
-      body.innerHTML = '';
-      prevBody.innerHTML = '';
-
-      if (currentBillItems.length === 0) {
-        prevBody.innerHTML = `<tr><td colspan="4" class="text-center p-2 text-gray-400">No items added yet</td></tr>`;
-      }
-
-      let grandTotal = 0;
-      currentBillItems.forEach((item, idx) => {
-        grandTotal += item.total;
-        body.innerHTML += `
-          <tr>
-            <td class="border p-2">${item.name}</td>
-            <td class="border p-2">₹${item.price}</td>
-            <td class="border p-2">${item.qty}</td>
-            <td class="border p-2">₹${item.total}</td>
-            <td class="border p-2"><button onclick="removeItem(${idx})" class="text-red-500 font-bold">X</button></td>
-          </tr>
-        `;
-        prevBody.innerHTML += `
-          <tr>
-            <td class="border p-1">${item.name}</td>
-            <td class="border p-1">₹${item.price}</td>
-            <td class="border p-1">${item.qty}</td>
-            <td class="border p-1">₹${item.total}</td>
-          </tr>
-        `;
-      });
-
-      document.getElementById('bill-grand-total').innerText = grandTotal;
-      document.getElementById('prev-total').innerText = grandTotal;
-      updatePreview();
-    }
-
-    function removeItem(idx) {
-      currentBillItems.splice(idx, 1);
-      renderBillItems();
-    }
-
-    function printCurrentPreview() {
-      if (currentBillItems.length === 0) return alert('Please add items to print!');
-      const printContents = document.getElementById('invoice-preview').innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = `<div style="padding: 20px; max-width: 400px; margin: auto;">${printContents}</div>`;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload();
-    }
-
-    async function saveAndPrintBill() {
-      if (currentBillItems.length === 0) return alert('Bill is empty!');
-      
-      const invoiceData = {
-        invoiceNo: document.getElementById('prev-inv-no').innerText,
-        date: document.getElementById('prev-date').innerText,
-        timestamp: new Date().getTime(),
-        customerName: document.getElementById('cust-name').value || 'Walk-in Customer',
-        mobile: document.getElementById('cust-mobile').value || 'N/A',
-        vehicleModel: document.getElementById('vehicle-model').value || 'N/A',
-        vehicleNo: document.getElementById('vehicle-no').value || 'N/A',
-        items: currentBillItems,
-        itemsSummary: currentBillItems.map(i => `${i.name} (${i.qty} x ₹${i.price})`).join(', '),
-        totalAmount: document.getElementById('bill-grand-total').innerText,
-        paymentMode: document.getElementById('payment-mode').value
-      };
-
-      try {
-        if (editingDocId) {
-          await db.collection('bills').doc(editingDocId).update(invoiceData);
-          alert('Bill Updated Successfully!');
-        } else {
-          await db.collection('bills').add(invoiceData);
-          fetch(GOOGLE_APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(invoiceData)
-          });
-          alert('Bill Saved, Synced & Professional Emails Triggered Successfully!');
-        }
-
-        printCurrentPreview();
-        resetBillingForm();
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    }
-
-    function resetBillingForm() {
-      editingDocId = null;
-      currentBillItems = [];
-      document.getElementById('cust-name').value = '';
-      document.getElementById('cust-mobile').value = '';
-      document.getElementById('vehicle-model').value = '';
-      document.getElementById('vehicle-no').value = '';
-      document.getElementById('badge-mode').innerText = "Creating New Bill";
-      document.getElementById('cancel-edit-btn').classList.add('hidden');
-      renderBillItems();
-      initNewInvoice();
-    }
-
-    async function loadBillHistory() {
-      const snapshot = await db.collection('bills').orderBy('timestamp', 'desc').get();
-      allBillsCache = [];
-      snapshot.forEach(doc => {
-        allBillsCache.push({ id: doc.id, ...doc.data() });
-      });
-      renderHistoryTable(allBillsCache);
-    }
-
-    function renderHistoryTable(bills) {
-      const body = document.getElementById('history-table-body');
-      body.innerHTML = '';
-      if (bills.length === 0) {
-        body.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-gray-400">No bills found</td></tr>`;
-        return;
-      }
-      bills.forEach(bill => {
-        body.innerHTML += `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="border p-2 font-semibold text-blue-600">${bill.invoiceNo}</td>
-            <td class="border p-2 text-xs">${bill.date}</td>
-            <td class="border p-2">${bill.customerName}<br><span class="text-xs text-gray-500">${bill.mobile}</span></td>
-            <td class="border p-2 text-xs">${bill.vehicleModel}<br>${bill.vehicleNo}</td>
-            <td class="border p-2 text-xs">${bill.itemsSummary}</td>
-            <td class="border p-2 font-bold">₹${bill.totalAmount}</td>
-            <td class="border p-2 text-xs">${bill.paymentMode}</td>
-            <td class="border p-2 space-x-1 whitespace-nowrap">
-              <button onclick="editBill('${bill.id}')" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">Edit</button>
-              <button onclick="deleteBill('${bill.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Delete</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function filterBills() {
-      const type = document.getElementById('filter-type').value;
-      const query = document.getElementById('search-query').value.toLowerCase();
-      const now = new Date();
-
-      let filtered = allBillsCache.filter(bill => {
-        const matchesQuery = bill.customerName.toLowerCase().includes(query) || 
-                             bill.mobile.toLowerCase().includes(query) || 
-                             bill.invoiceNo.toLowerCase().includes(query) || 
-                             bill.vehicleNo.toLowerCase().includes(query);
-        if (!matchesQuery) return false;
-
-        if (type === 'daily') {
-          return bill.date === now.toLocaleDateString('en-IN');
-        } else if (type === 'weekly') {
-          const billDate = new Date(bill.timestamp);
-          const diffTime = Math.abs(now - billDate);
-          const diffDays = diffTime / (1000 * 60 * 60 * 24);
-          return diffDays <= 7;
-        } else if (type === 'monthly') {
-          const billDate = new Date(bill.timestamp);
-          return billDate.getMonth() === now.getMonth() && billDate.getFullYear() === now.getFullYear();
-        }
-        return true;
-      });
-
-      renderHistoryTable(filtered);
-    }
-
-    async function editBill(id) {
-      const bill = allBillsCache.find(b => b.id === id);
-      if (!bill) return;
-
-      editingDocId = bill.id;
-      document.getElementById('prev-inv-no').innerText = bill.invoiceNo;
-      document.getElementById('prev-date').innerText = bill.date;
-      document.getElementById('cust-name').value = bill.customerName;
-      document.getElementById('cust-mobile').value = bill.mobile;
-      document.getElementById('vehicle-model').value = bill.vehicleModel || '';
-      document.getElementById('vehicle-no').value = bill.vehicleNo || '';
-      document.getElementById('payment-mode').value = bill.paymentMode || 'Cash';
-      currentBillItems = bill.items || [];
-
-      document.getElementById('badge-mode').innerText = `Editing: ${bill.invoiceNo}`;
-      document.getElementById('cancel-edit-btn').classList.remove('hidden');
-
-      switchTab('billing');
-      renderBillItems();
-    }
-
-    async function deleteBill(id) {
-      if (confirm('Are you sure you want to delete this bill?')) {
-        await db.collection('bills').doc(id).delete();
-        loadBillHistory();
-      }
-    }
-
-    function loadInventory() {
-      db.collection('inventory').onSnapshot(snapshot => {
-        const body = document.getElementById('inventory-table-body');
-        body.innerHTML = '';
-        snapshot.forEach(doc => {
-          const item = doc.data();
-          body.innerHTML += `
-            <tr>
-              <td class="border p-2">${item.name}</td>
-              <td class="border p-2">₹${item.price}</td>
-              <td class="border p-2">${item.stock}</td>
-              <td class="border p-2">
-                <button onclick="deleteStockItem('${doc.id}')" class="text-red-600 font-semibold text-xs">Delete</button>
-              </td>
-            </tr>
-          `;
-        });
-      });
-    }
-
-    async function openAddStockModal() {
-      const name = prompt('Enter Item Name:');
-      const price = prompt('Enter Item Price (₹):');
-      const stock = prompt('Enter Quantity Stock:');
-      if (name && price && stock) {
-        await db.collection('inventory').add({ name, price: parseFloat(price), stock: parseInt(stock) });
-      }
-    }
-
-    async function deleteStockItem(id) {
-      if (confirm('Delete this stock item?')) {
-        await db.collection('inventory').doc(id).delete();
-      }
-    }
-  </script>
-</body>
-</html>
+<script>
+const firebaseConfig={apiKey:"AIzaSyA2hfa5mGhR-gNfH_d33wnTCl90Yh62Ipc",authDomain:"anaya-automobiles.firebaseapp.com",projectId:"anaya-automobiles",storageBucket:"anaya-automobiles.firebasestorage.app",messagingSenderId:"823594933535",appId:"1:823594933535:web:ac13ae7538013154c7642a"};
+const GOOGLE_APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbziIU6H-dAHmZ03eIVfPKkYhY_hM13sVxqZ8B3D1e5n3IiHP0mRIkCkcN7P-NzZ6MbRjw/exec";
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
+let currentBillItems=[],allBillsCache=[],inventoryCache=[],editingDocId=null,editingOriginal=null,inventoryUnsub=null,billsUnsub=null,reservedInvoiceNo=null;
+const $=id=>document.getElementById(id),money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),todayKey=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`},today=todayKey(new Date());
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setTab(tab){['dashboard','billing','history','inventory'].forEach(t=>{$('section-'+t).classList.toggle('hidden',t!==tab);document.querySelector(`[data-tab="${t}"]`)?.classList.toggle('active',t===tab)});if(tab==='history')filterBills()}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
+auth.onAuthStateChanged(user=>{if(user){$('login-screen').classList.add('hidden');$('dashboard-screen').classList.remove('hidden');$('user-display').textContent=user.email\vert{}\vert{}'';startListeners();resetBillingForm()}else{$('login-screen').classList.remove('hidden');$('dashboard-screen').classList.add('hidden');if(billsUnsub)billsUnsub();if(inventoryUnsub)inventoryUnsub()}});$('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').classList.add('hidden');try{await auth.signInWithEmailAndPassword($('login-email').value.trim(),$('login-password').value)}catch(err){$('login-error').textContent=err.message;$('login-error').classList.remove('hidden')}});$('logout-btn').onclick=()=>auth.signOut();
+function startListeners(){if(billsUnsub)billsUnsub();if(inventoryUnsub)inventoryUnsub();billsUnsub=db.collection('bills').onSnapshot(s=>{allBillsCache=s.docs.map(d=>({id:d.id,...d.data()}));allBillsCache.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));renderDashboard();filterBills()},e=>alert('Bills error: '+e.message));inventoryUnsub=db.collection('inventory').onSnapshot(s=>{inventoryCache=s.docs.map(d=>({id:d.id,...d.data()}));renderInventory();renderInventoryOptions();renderDashboard()},e=>alert('Inventory error: '+e.message))}
+function invoiceTotal(){const sub=currentBillItems.reduce((s,i)=>s+Number(i.price)*Number(i.qty),0);const discount=Math.max(0,Number($('bill-discount').value)||0);return {sub,discount,total:Math.max(0,sub-discount)}}
+function updatePreview(){const fields=[['cust-name','prev-cust-name','Walk-in'],['cust-mobile','prev-cust-mobile','N/A'],['vehicle-model','prev-vehicle-model','-'],['vehicle-no','prev-vehicle-no','-']];fields.forEach(([a,b,fb])=>$(b).textContent=$(a).value||fb);$('prev-pay-mode').textContent=$('payment-mode').value;const {sub,discount,total}=invoiceTotal();$('bill-grand-total').textContent=money(total);$('prev-subtotal').textContent=money(sub);$('prev-discount').textContent=money(discount);$('prev-total').textContent=money(total)}
+function renderBillItems(){const body=$('bill-items-body'),prev=$('prev-items-body');if(!currentBillItems.length){body.innerHTML='<tr><td colspan="5" class="text-center text-slate-400 py-6">No items added yet</td></tr>';prev.innerHTML='<tr><td colspan="4" class="text-center py-3 text-slate-400">No items yet</td></tr>'}else{body.innerHTML=currentBillItems.map((i,n)=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><input class="field" style="width:70px;padding:5px" type="number" min="1" step="1" value="${Number(i.qty)}" onchange="changeQty(${n},this.value)"></td><td class="font-bold">${money(Number(i.price)*Number(i.qty))}</td><td><button class="btn btn-danger" style="padding:4px 8px" onclick="removeItem(${n})">×</button></td></tr>`).join('');prev.innerHTML=currentBillItems.map(i=>`<tr><td style="padding:4px">${escapeHtml(i.name)}</td><td style="padding:4px">${money(i.price)}</td><td style="padding:4px">${Number(i.qty)}</td><td style="padding:4px">${money(Number(i.price)*Number(i.qty))}</td></tr>`).join('')}updatePreview()}
+function changeQty(n,v){const q=Number(v);if(!Number.isInteger(q)||q<1){alert('Invalid quantity');renderBillItems();return}currentBillItems[n].qty=q;renderBillItems()}
+function removeItem(n){currentBillItems.splice(n,1);renderBillItems()}
+$('add-item-btn').onclick=()=>{const name=$('item-name').value.trim(),price=Number($('item-price').value),qty=Number($('item-qty').value);if(!name||$('item-price').value===''\vert{}\vert{}price<0\vert{}\vert{}qty<1){alert('Enter valid item details');return}currentBillItems.push({name,price,qty,total:price*qty});$('item-name').value='';$('item-price').value='';$('item-qty').value='1';renderBillItems()};
+['cust-name','cust-mobile','vehicle-model','vehicle-no','payment-mode','bill-discount'].forEach(id=>$(id).addEventListener('input',updatePreview));$('payment-mode').addEventListener('change',updatePreview);
+function renderInventoryOptions(){$('inventory-options').innerHTML=inventoryCache.map(i=>`<option value="${escapeHtml(i.name)}"></option>`).join('')}
+async function getNextInvoiceNo(){const ref=db.collection('settings').doc('invoiceCounter');return db.runTransaction(async tx=>{const snap=await tx.get(ref);let next=Number(snap.exists?snap.data().next:1001);if(next<1001)next=1001;tx.set(ref,{next:next+1},{merge:true});return 'INV-'+next})}
+async function resetBillingForm(){editingDocId=null;editingOriginal=null;reservedInvoiceNo=null;currentBillItems=[];$('cust-name').value='';$('cust-mobile').value='';$('vehicle-model').value='';$('vehicle-no').value='';$('payment-mode').value='Cash';$('bill-discount').value='0';$('badge-mode').textContent='NEW BILL';$('cancel-edit-btn').classList.add('hidden');$('save-print-btn').textContent='💾 Save, Sync Sheet & Email';$('save-status').textContent='';$('prev-date').textContent=new Date().toLocaleDateString('en-IN');$('prev-inv-no').textContent='Loading…';renderBillItems();try{reservedInvoiceNo=await getNextInvoiceNo();$('prev-inv-no').textContent=reservedInvoiceNo}catch(e){$('prev-inv-no').textContent='INV-PENDING'}}
+$('clear-form-btn').onclick=resetBillingForm;$('cancel-edit-btn').onclick=resetBillingForm;
+function invoicePayload(){const {sub,discount,total}=invoiceTotal();return {invoiceNo:$('prev-inv-no').textContent,date:$('prev-date').textContent,dateKey:todayKey(new Date()),timestamp:editingOriginal?.timestamp||Date.now(),updatedAt:Date.now(),customerName:$('cust-name').value.trim()\vert{}\vert{}'Walk-in Customer',mobile:$('cust-mobile').value.trim()||'N/A',vehicleModel:$('vehicle-model').value.trim()\vert{}\vert{}'N/A',vehicleNo:$('vehicle-no').value.trim().toUpperCase()||'N/A',items:currentBillItems.map(i=>({name:i.name,price:Number(i.price),qty:Number(i.qty),total:Number(i.price)*Number(i.qty)})),itemsSummary:currentBillItems.map(i=>`${i.name} (${i.qty} x ₹${i.price})`).join(', '),subtotal:sub,discount,totalAmount:total,paymentMode:$('payment-mode').value}}
+async function syncBackup(payload,action='upsert'){try{await fetch(GOOGLE_APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});return true}catch(e){console.error(e);return false}}
+$('save-print-btn').onclick=async()=>{if(!currentBillItems.length){alert('Add items to bill');return}const btn=$('save-print-btn');btn.disabled=true;btn.textContent='Saving & Processing...';try{let payload=invoicePayload();if(editingDocId){await db.collection('bills').doc(editingDocId).update(payload);await syncBackup(payload,'upsert');alert('Bill updated successfully!')}else{const invoiceNo=reservedInvoiceNo||await getNextInvoiceNo();payload.invoiceNo=invoiceNo;$('prev-inv-no').textContent=invoiceNo;await db.collection('bills').doc(invoiceNo).set(payload);await syncBackup(payload,'upsert');alert('Bill saved, sheet synced & 4 emails triggered successfully!')}setTab('history');printInvoice(payload);await resetBillingForm()}catch(e){alert('Error: '+e.message)}finally{btn.disabled=false;btn.textContent='💾 Save, Sync Sheet & Email'}};
+function printInvoice(data){const items=(data.items||[]).map(i=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(i.total)}</td></tr>`).join('');$('print-root').innerHTML=`<div class="invoice-paper p-6 max-w-3xl mx-auto"><div class="text-center border-b-2 border-slate-800 pb-3"><div style="font-size:24px;font-weight:900">ANAYA AUTOMOBILES</div><div style="font-weight:bold;letter-spacing:3px">CAR MARKET</div><p>Amarpur Road, Barhi</p><p>Mo: 9893931743 · 7999367203</p></div><div style="display:flex;justify-content:space-between;margin:15px 0"><div><p><b>Customer:</b> ${escapeHtml(data.customerName)}</p><p><b>Mobile:</b> ${escapeHtml(data.mobile)}</p><p><b>Vehicle:</b> ${escapeHtml(data.vehicleModel)}</p></div><div style="text-align:right"><p><b>Invoice:</b> ${escapeHtml(data.invoiceNo)}</p><p><b>Date:</b> ${escapeHtml(data.date)}</p><p><b>Vehicle No:</b> ${escapeHtml(data.vehicleNo)}</p></div></div><div class="watermark-table"><table style="min-width:0"><thead><tr><th>Item</th><th>Rate</th><th>Qty</th><th>Total</th></tr></thead><tbody>${items}</tbody></table></div><div style="margin-top:15px;border-top:1px solid #ddd;padding-top:8px"><p style="display:flex;justify-content:space-between"><span>Subtotal</span><b>${money(data.subtotal)}</b></p><p style="display:flex;justify-content:space-between"><span>Discount</span><b>${money(data.discount)}</b></p><p style="display:flex;justify-content:space-between;font-size:16px;border-top:1px solid #ddd;padding-top:6px"><b>Grand Total</b><b>${money(data.totalAmount)}</b></p><p><b>Payment:</b> ${escapeHtml(data.paymentMode)}</p></div><div style="display:flex;justify-content:space-between;align-items:end;margin-top:40px"><b>Thank you! Visit again 🙏</b><div style="border-top:1px solid #444;padding-top:4px">Authorised Signatory</div></div></div>`;$('print-root').classList.remove('hidden');setTimeout(()=>{window.print();$('print-root').classList.add('hidden')},100)}$('quick-print-btn').onclick=()=>{if(!currentBillItems.length){alert('Add items first');return}printInvoice(invoicePayload())};
+function renderHistoryTable(bills){const body=$('history-table-body');if(!bills.length){body.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">No bills found</td></tr>';return}body.innerHTML=bills.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date)}</td><td>${escapeHtml(b.customerName)}<br><span class="text-xs text-slate-500">${escapeHtml(b.mobile)}</span></td><td>${escapeHtml(b.vehicleModel)}<br><span class="text-xs text-slate-500">${escapeHtml(b.vehicleNo)}</span></td><td class="max-w-xs">${escapeHtml(b.itemsSummary||'')}</td><td class="font-bold">${money(b.totalAmount)}</td><td>${escapeHtml(b.paymentMode)}</td><td><div class="flex gap-1.5"><button class="btn btn-light" style="padding:5px 8px" onclick="editBill('${b.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteBill('${b.id}')">Delete</button></div></td></tr>`).join('')}
+function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp\vert{}\vert{}0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v\vert{}\vert{}'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
+$('filter-type').onchange=filterBills;$('search-query').oninput=filterBills;
+window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile\vert{}\vert{}'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo\vert{}\vert{}'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)\vert{}\vert{}0;currentBillItems=(b.items\vert{}\vert{}[]).map(i=>({...i,price:Number(i.price)\vert{}\vert{}0,qty:Number(i.qty)\vert{}\vert{}1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.remove('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
+window.deleteBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b||!confirm(`Delete ${b.invoiceNo}?`))return;try{await db.collection('bills').doc(id).delete();await syncBackup({invoiceNo:b.invoiceNo,deletedAt:Date.now()},'delete')}catch(e){alert(e.message)}};
+function renderDashboard(){const sum=arr=>arr.reduce((s,b)=>s+Number(b.totalAmount||0),0),todayBills=allBillsCache.filter(b=>todayKey(b.timestamp||0)===today),monthBills=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0);return d.getMonth()===new Date().getMonth()&&d.getFullYear()===new Date().getFullYear()});$('stat-today').textContent=money(sum(todayBills));$('stat-today-count').textContent=todayBills.length+' bills today';$('stat-month').textContent=money(sum(monthBills));$('stat-bills').textContent=allBillsCache.length;$('stat-stock').textContent=inventoryCache.length;const recent=allBillsCache.slice(0,6);$('recent-bills').innerHTML=recent.length?recent.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date||'')}</td><td>${escapeHtml(b.customerName||'')}</td><td>${escapeHtml(b.paymentMode||'')}</td><td class="font-bold">${money(b.totalAmount)}</td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-slate-400 py-6">No bills saved yet</td></tr>'}
+function renderInventory(){const body=$('inventory-table-body');$('inventory-count').textContent=inventoryCache.length;$('inventory-units').textContent=inventoryCache.reduce((s,i)=>s+Math.max(0,Number(i.stock)||0),0);$('inventory-low').textContent=inventoryCache.filter(i=>Number(i.stock)<=5).length;body.innerHTML=inventoryCache.length?inventoryCache.map(i=>`<tr><td class="font-semibold">${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><span class="${Number(i.stock)<=5?'text-red-600 font-bold':''}">${Number(i.stock)||0}</span></td><td><div class="flex gap-2"><button class="btn btn-light" style="padding:5px 8px" onclick="editStock('${i.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteStockItem('${i.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-slate-400 py-6">No inventory items</td></tr>'}
+$('add-stock-btn').onclick=async()=>{const name=prompt('Item name:');if(!name?.trim())return;const price=prompt('Selling price (₹):','0');if(price===null)return;const stock=prompt('Opening stock quantity:','0');if(stock===null)return;try{await db.collection('inventory').add({name:name.trim(),price:Number(price),stock:Number(stock),updatedAt:Date.now()})}catch(e){alert(e.message)}};
+window.editStock=async id=>{const i=inventoryCache.find(x=>x.id===id);if(!i)return;const name=prompt('Item name:',i.name);if(name===null)return;const price=prompt('Price (₹):',i.price);if(price===null)return;const stock=prompt('Available stock:',i.stock);if(stock===null)return;try{await db.collection('inventory').doc(id).update({name:name.trim(),price:Number(price),stock:Number(stock),updatedAt:Date.now()})}catch(e){alert(e.message)}};
+window.deleteStockItem=async id=>{if(!confirm('Delete this stock item?'))return;try{await db.collection('inventory').doc(id).delete()}catch(e){alert(e.message)}};
+</script>
+</body></html>

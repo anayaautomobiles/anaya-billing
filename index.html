@@ -8,23 +8,23 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
-:root{--navy:#0b1329;--blue:#1d4ed8;--gold:#f59e0b;--accent:#3b82f6}
-*{box-sizing:border-box}body{background:#f8fafc;color:#0f172a;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.glass{background:rgba(255,255,255,.98);border:1px solid #e2e8f0;box-shadow:0 10px 25px -3px rgba(15,23,42,.05),0 4px 6px -4px rgba(15,23,42,.05);border-radius:16px}
-.btn{border-radius:10px;padding:10px 16px;font-weight:600;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btn-primary{background:var(--blue);color:white;box-shadow:0 4px 12px rgba(29,78,216,.25)}.btn-primary:hover{background:#1e40af;transform:translateY(-1px)}
-.btn-dark{background:var(--navy);color:white}.btn-dark:hover{background:#1e293b}
-.btn-light{background:#f1f5f9;color:#334155}.btn-light:hover{background:#e2e8f0}
-.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fee2e2}.btn-danger:hover{background:#fee2e2}
-.field{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 14px;background:#fff;outline:none;transition:all .2s ease;font-size:14px}
+:root{--navy:#0b1329;--blue:#1d4ed8;--gold:#f59e0b}
+*{box-sizing:border-box}body{background:#f8fafc;color:#0f172a;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+.glass{background:rgba(255,255,255,.98);border:1px solid #e2e8f0;box-shadow:0 10px 25px -3px rgba(15,23,42,.05);border-radius:16px}
+.btn{border-radius:10px;padding:10px 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--blue);color:white}.btn-primary:hover{background:#1e40af}
+.btn-dark{background:var(--navy);color:white}
+.btn-light{background:#f1f5f9;color:#334155}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fee2e2}
+.field{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 14px;background:#fff;outline:none;font-size:14px}
 .field:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
-.nav-btn{padding:10px 18px;border-radius:10px;font-weight:600;color:#64748b;white-space:nowrap;transition:all .2s ease}
-.nav-btn.active{background:#eff6ff;color:var(--blue);box-shadow:0 2px 6px rgba(37,99,235,.08)}
-.stat{border-radius:16px;padding:20px;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1px solid #e2e8f0;box-shadow:0 4px 6px -1px rgba(0,0,0,.02)}
+.nav-btn{padding:10px 18px;border-radius:10px;font-weight:600;color:#64748b;white-space:nowrap}
+.nav-btn.active{background:#eff6ff;color:var(--blue)}
+.stat{border-radius:16px;padding:20px;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1px solid #e2e8f0}
 .table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f8fafc;font-weight:700}td,th{padding:14px;border-bottom:1px solid #f1f5f9;text-align:left}td{font-size:13px;color:#334155}
-.watermark-table{position:relative;isolation:isolate}.watermark-table:before{content:"ANAYA\\A AUTOMOBILES";white-space:pre;position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%) rotate(-22deg);z-index:-1;border:3px double rgba(37,99,235,.08);border-radius:50%;width:180px;height:180px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:18px;line-height:1.2;letter-spacing:2px;color:rgba(37,99,235,.08);pointer-events:none}
+.watermark-table{position:relative;isolation:isolate}.watermark-table:before{content:"ANAYA\\A AUTOMOBILES";white-space:pre;position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%) rotate(-22deg);z-index:-1;border:3px double rgba(37,99,235,.08);border-radius:50%;width:180px;height:180px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:18px;color:rgba(37,99,235,.08);pointer-events:none}
 .invoice-paper{position:relative;background:white;color:#0f172a;font-family:Arial,sans-serif}.invoice-paper:before{content:"ANAYA AUTOMOBILES";position:absolute;top:48%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);font-size:26px;font-weight:900;letter-spacing:3px;color:rgba(37,99,235,.06);white-space:nowrap;pointer-events:none}.invoice-paper>*{position:relative}
-@media print{body *{visibility:hidden!important}#print-root,#print-root *{visibility:visible!important}#print-root{position:absolute;left:0;top:0;width:100%;padding:0!important;margin:0!important}.invoice-paper{width:100%;border:0!important;box-shadow:none!important}.no-print{display:none!important}}
+@media print{body *{visibility:hidden!important}#print-root,#print-root *{visibility:visible!important}#print-root{position:absolute;left:0;top:0;width:100%}.invoice-paper{width:100%;border:0!important;box-shadow:none!important}}
 </style>
 </head>
 <body>
@@ -38,8 +38,8 @@
    <p class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Car Market · Amarpur Road, Barhi</p>
   </div>
   <form id="login-form" class="space-y-4">
-   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Email ID</label><input id="login-email" type="email" required class="field" autocomplete="username" placeholder="anayaautomobiles.tmp@gmail.com"></div>
-   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label><input id="login-password" type="password" required class="field" autocomplete="current-password" placeholder="••••••••"></div>
+   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Email ID</label><input id="login-email" type="email" required class="field" value="anayaautomobiles.tmp@gmail.com"></div>
+   <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Password</label><input id="login-password" type="password" required class="field" placeholder="Enter password"></div>
    <button class="btn btn-primary w-full mt-2 py-3 font-bold" type="submit">Secure Login →</button>
   </form>
   <p id="login-error" class="text-sm text-red-600 mt-4 text-center font-medium hidden bg-red-50 p-3 rounded-lg border border-red-100"></p>
@@ -191,7 +191,7 @@
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Bills Shown</p><p id="filtered-count" class="text-xl font-black text-slate-900 mt-1">0</p></div>
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Udhaar Credit Total</p><p id="filtered-credit" class="text-xl font-black text-amber-600 mt-1">₹0</p></div>
    </div>
-   <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer & Mobile</th><th>Vehicle Details</th><th>Items Summary</th><th>Total</th><th>Payment</th><th>Actions</th></tr></thead><tbody id="history-table-body"></tbody></table></div>
+   <div class="table-wrap"><thead><tr><th>Invoice #</th><th>Date</th><th>Customer & Mobile</th><th>Vehicle Details</th><th>Items Summary</th><th>Total</th><th>Payment</th><th>Actions</th></tr></thead><tbody id="history-table-body"></tbody></table></div>
   </section>
 
   <section id="section-inventory" class="hidden glass p-6 space-y-5">
@@ -204,7 +204,7 @@
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Units in Stock</p><p id="inventory-units" class="text-xl font-black text-slate-900 mt-1">0</p></div>
     <div class="stat"><p class="text-xs font-bold text-slate-500 uppercase">Low Stock (≤ 5)</p><p id="inventory-low" class="text-xl font-black text-red-600 mt-1">0</p></div>
    </div>
-   <div class="table-wrap"><table><thead><tr><th>Item Name</th><th>Price (₹)</th><th>Available Stock</th><th>Actions</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
+   <div class="table-wrap"><thead><tr><th>Item Name</th><th>Price (₹)</th><th>Available Stock</th><th>Actions</th></tr></thead><tbody id="inventory-table-body"></tbody></table></div>
   </section>
  </main>
 </div>
@@ -214,16 +214,37 @@
 <script>
 const firebaseConfig={apiKey:"AIzaSyA2hfa5mGhR-gNfH_d33wnTCl90Yh62Ipc",authDomain:"anaya-automobiles.firebaseapp.com",projectId:"anaya-automobiles",storageBucket:"anaya-automobiles.firebasestorage.app",messagingSenderId:"823594933535",appId:"1:823594933535:web:ac13ae7538013154c7642a"};
 const GOOGLE_APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbziIU6H-dAHmZ03eIVfPKkYhY_hM13sVxqZ8B3D1e5n3IiHP0mRIkCkcN7P-NzZ6MbRjw/exec";
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
+
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore();
+
+// ENSURE AUTH PERSISTENCE IS LOCAL TO AVOID SESSION DROPS
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err => console.error("Persistence error:", err));
+
 let currentBillItems=[],allBillsCache=[],inventoryCache=[],editingDocId=null,editingOriginal=null,inventoryUnsub=null,billsUnsub=null,reservedInvoiceNo=null;
 const $=id=>document.getElementById(id),money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),todayKey=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`},today=todayKey(new Date());
+
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setTab(tab){['dashboard','billing','history','inventory'].forEach(t=>{$('section-'+t).classList.toggle('hidden',t!==tab);document.querySelector(`[data-tab="${t}"]`)?.classList.toggle('active',t===tab)});if(tab==='history')filterBills()}
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 
-auth.onAuthStateChanged(user=>{if(user){$('login-screen').classList.add('hidden');$('dashboard-screen').classList.remove('hidden');$('user-display').textContent=user.email||'';startListeners();resetBillingForm()}else{$('login-screen').classList.remove('hidden');$('dashboard-screen').classList.add('hidden');if(billsUnsub)billsUnsub();if(inventoryUnsub)inventoryUnsub()}});
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 
-// ROBUST LOGIN EVENT LISTENER WITH ERROR CAPTURE
+auth.onAuthStateChanged(user=>{
+  const errEl=$('login-error');
+  if(user){
+    if(errEl) errEl.classList.add('hidden');
+    $('login-screen').classList.add('hidden');
+    $('dashboard-screen').classList.remove('hidden');$('user-display').textContent=user.email||'Anaya Admin';
+    startListeners();
+    resetBillingForm();
+  }else{
+    $('login-screen').classList.remove('hidden');$('dashboard-screen').classList.add('hidden');
+    if(billsUnsub)billsUnsub();
+    if(inventoryUnsub)inventoryUnsub();
+  }
+});
+
 $('login-form').addEventListener('submit',async e=>{
   e.preventDefault();
   const errEl=$('login-error');
@@ -238,8 +259,15 @@ $('login-form').addEventListener('submit',async e=>{
   }
 });
 
-$('logout-btn').onclick=()=>auth.signOut();
-function startListeners(){if(billsUnsub)billsUnsub();if(inventoryUnsub)inventoryUnsub();billsUnsub=db.collection('bills').onSnapshot(s=>{allBillsCache=s.docs.map(d=>({id:d.id,...d.data()}));allBillsCache.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));renderDashboard();filterBills()},e=>alert('Bills error: '+e.message));inventoryUnsub=db.collection('inventory').onSnapshot(s=>{inventoryCache=s.docs.map(d=>({id:d.id,...d.data()}));renderInventory();renderInventoryOptions();renderDashboard()},e=>alert('Inventory error: '+e.message))}
+$('logout-btn').onclick=()=>auth.signOut().then(()=>window.location.reload());
+
+function startListeners(){
+  if(billsUnsub)billsUnsub();
+  if(inventoryUnsub)inventoryUnsub();
+  billsUnsub=db.collection('bills').onSnapshot(s=>{allBillsCache=s.docs.map(d=>({id:d.id,...d.data()}));allBillsCache.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));renderDashboard();filterBills()},e=>console.error(e));
+  inventoryUnsub=db.collection('inventory').onSnapshot(s=>{inventoryCache=s.docs.map(d=>({id:d.id,...d.data()}));renderInventory();renderInventoryOptions();renderDashboard()},e=>console.error(e));
+}
+
 function invoiceTotal(){const sub=currentBillItems.reduce((s,i)=>s+Number(i.price)*Number(i.qty),0);const discount=Math.max(0,Number($('bill-discount').value)||0);return {sub,discount,total:Math.max(0,sub-discount)}}
 function updatePreview(){const fields=[['cust-name','prev-cust-name','Walk-in'],['cust-mobile','prev-cust-mobile','N/A'],['vehicle-model','prev-vehicle-model','-'],['vehicle-no','prev-vehicle-no','-']];fields.forEach(([a,b,fb])=>$(b).textContent=$(a).value||fb);$('prev-pay-mode').textContent=$('payment-mode').value;const {sub,discount,total}=invoiceTotal();$('bill-grand-total').textContent=money(total);$('prev-subtotal').textContent=money(sub);$('prev-discount').textContent=money(discount);$('prev-total').textContent=money(total)}
 function renderBillItems(){const body=$('bill-items-body'),prev=$('prev-items-body');if(!currentBillItems.length){body.innerHTML='<tr><td colspan="5" class="text-center text-slate-400 py-6">No items added yet</td></tr>';prev.innerHTML='<tr><td colspan="4" class="text-center py-3 text-slate-400">No items yet</td></tr>'}else{body.innerHTML=currentBillItems.map((i,n)=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><input class="field" style="width:70px;padding:5px" type="number" min="1" step="1" value="${Number(i.qty)}" onchange="changeQty(${n},this.value)"></td><td class="font-bold">${money(Number(i.price)*Number(i.qty))}</td><td><button class="btn btn-danger" style="padding:4px 8px" onclick="removeItem(${n})">×</button></td></tr>`).join('');prev.innerHTML=currentBillItems.map(i=>`<tr><td style="padding:4px">${escapeHtml(i.name)}</td><td style="padding:4px">${money(i.price)}</td><td style="padding:4px">${Number(i.qty)}</td><td style="padding:4px">${money(Number(i.price)*Number(i.qty))}</td></tr>`).join('')}updatePreview()}
@@ -249,16 +277,16 @@ $('add-item-btn').onclick=()=>{const name=$('item-name').value.trim(),price=Numb
 ['cust-name','cust-mobile','vehicle-model','vehicle-no','payment-mode','bill-discount'].forEach(id=>$(id).addEventListener('input',updatePreview));$('payment-mode').addEventListener('change',updatePreview);
 function renderInventoryOptions(){$('inventory-options').innerHTML=inventoryCache.map(i=>`<option value="${escapeHtml(i.name)}"></option>`).join('')}
 async function getNextInvoiceNo(){const ref=db.collection('settings').doc('invoiceCounter');return db.runTransaction(async tx=>{const snap=await tx.get(ref);let next=Number(snap.exists?snap.data().next:1001);if(next<1001)next=1001;tx.set(ref,{next:next+1},{merge:true});return 'INV-'+next})}
-async function resetBillingForm(){editingDocId=null;editingOriginal=null;reservedInvoiceNo=null;currentBillItems=[];$('cust-name').value='';$('cust-mobile').value='';$('vehicle-model').value='';$('vehicle-no').value='';$('payment-mode').value='Cash';$('bill-discount').value='0';$('badge-mode').textContent='NEW BILL';$('cancel-edit-btn').classList.add('hidden');$('save-print-btn').textContent='💾 Save, Sync Sheet & Email';$('save-status').textContent='';$('prev-date').textContent=new Date().toLocaleDateString('en-IN');$('prev-inv-no').textContent='Loading…';renderBillItems();try{reservedInvoiceNo=await getNextInvoiceNo();$('prev-inv-no').textContent=reservedInvoiceNo}catch(e){$('prev-inv-no').textContent='INV-PENDING'}}
+async function resetBillingForm(){editingDocId=null;editingOriginal=null;reservedInvoiceNo=null;currentBillItems=[];$('cust-name').value='';$('cust-mobile').value='';$('vehicle-model').value='';$('vehicle-no').value='';$('payment-mode').value='Cash';$('bill-discount').value='0';$('badge-mode').textContent='NEW BILL';$('cancel-edit-btn').classList.add('hidden');$('save-print-btn').textContent='💾 Save, Sync Sheet & Email';$('save-status').textContent='';$('prev-date').textContent=new Date().toLocaleDateString('en-IN');$('prev-inv-no').textContent='Loading…';renderBillItems();try{reservedInvoiceNo=await getNextInvoiceNo();$('prev-inv-no').textContent=reservedInvoiceNo}catch(e){$('prev-inv-no').textContent='INV-1001'}}
 $('clear-form-btn').onclick=resetBillingForm;$('cancel-edit-btn').onclick=resetBillingForm;
 function invoicePayload(){const {sub,discount,total}=invoiceTotal();return {invoiceNo:$('prev-inv-no').textContent,date:$('prev-date').textContent,dateKey:todayKey(new Date()),timestamp:editingOriginal?.timestamp||Date.now(),updatedAt:Date.now(),customerName:$('cust-name').value.trim()\vert{}\vert{}'Walk-in Customer',mobile:$('cust-mobile').value.trim()||'N/A',vehicleModel:$('vehicle-model').value.trim()\vert{}\vert{}'N/A',vehicleNo:$('vehicle-no').value.trim().toUpperCase()||'N/A',items:currentBillItems.map(i=>({name:i.name,price:Number(i.price),qty:Number(i.qty),total:Number(i.price)*Number(i.qty)})),itemsSummary:currentBillItems.map(i=>`${i.name} (${i.qty} x ₹${i.price})`).join(', '),subtotal:sub,discount,totalAmount:total,paymentMode:$('payment-mode').value}}
 async function syncBackup(payload,action='upsert'){try{await fetch(GOOGLE_APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});return true}catch(e){console.error(e);return false}}
 $('save-print-btn').onclick=async()=>{if(!currentBillItems.length){alert('Add items to bill');return}const btn=$('save-print-btn');btn.disabled=true;btn.textContent='Saving & Processing...';try{let payload=invoicePayload();if(editingDocId){await db.collection('bills').doc(editingDocId).update(payload);await syncBackup(payload,'upsert');alert('Bill updated successfully!')}else{const invoiceNo=reservedInvoiceNo||await getNextInvoiceNo();payload.invoiceNo=invoiceNo;$('prev-inv-no').textContent=invoiceNo;await db.collection('bills').doc(invoiceNo).set(payload);await syncBackup(payload,'upsert');alert('Bill saved, sheet synced & 4 emails triggered successfully!')}setTab('history');printInvoice(payload);await resetBillingForm()}catch(e){alert('Error: '+e.message)}finally{btn.disabled=false;btn.textContent='💾 Save, Sync Sheet & Email'}};
 function printInvoice(data){const items=(data.items||[]).map(i=>`<tr><td>${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(data.total??i.total??i.price*i.qty)}</td></tr>`).join('');$('print-root').innerHTML=`<div class="invoice-paper p-6 max-w-3xl mx-auto"><div class="text-center border-b-2 border-slate-800 pb-3"><div style="font-size:24px;font-weight:900">ANAYA AUTOMOBILES</div><div style="font-weight:bold;letter-spacing:3px">CAR MARKET</div><p>Amarpur Road, Barhi</p><p>Mo: 9893931743 · 7999367203</p></div><div style="display:flex;justify-content:space-between;margin:15px 0"><div><p><b>Customer:</b> ${escapeHtml(data.customerName)}</p><p><b>Mobile:</b> ${escapeHtml(data.mobile)}</p><p><b>Vehicle:</b> ${escapeHtml(data.vehicleModel)}</p></div><div style="text-align:right"><p><b>Invoice:</b> ${escapeHtml(data.invoiceNo)}</p><p><b>Date:</b> ${escapeHtml(data.date)}</p><p><b>Vehicle No:</b> ${escapeHtml(data.vehicleNo)}</p></div></div><div class="watermark-table"><table style="min-width:0"><thead><tr><th>Item</th><th>Rate</th><th>Qty</th><th>Total</th></tr></thead><tbody>${items}</tbody></table></div><div style="margin-top:15px;border-top:1px solid #ddd;padding-top:8px"><p style="display:flex;justify-content:space-between"><span>Subtotal</span><b>${money(data.subtotal)}</b></p><p style="display:flex;justify-content:space-between"><span>Discount</span><b>${money(data.discount)}</b></p><p style="display:flex;justify-content:space-between;font-size:16px;border-top:1px solid #ddd;padding-top:6px"><b>Grand Total</b><b>${money(data.totalAmount)}</b></p><p><b>Payment:</b> ${escapeHtml(data.paymentMode)}</p></div><div style="display:flex;justify-content:space-between;align-items:end;margin-top:40px"><b>Thank you! Visit again 🙏</b><div style="border-top:1px solid #444;padding-top:4px">Authorised Signatory</div></div></div>`;$('print-root').classList.remove('hidden');setTimeout(()=>{window.print();$('print-root').classList.add('hidden')},100)}$('quick-print-btn').onclick=()=>{if(!currentBillItems.length){alert('Add items first');return}printInvoice(invoicePayload())};
 function renderHistoryTable(bills){const body=$('history-table-body');if(!bills.length){body.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">No bills found</td></tr>';return}body.innerHTML=bills.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date)}</td><td>${escapeHtml(b.customerName)}<br><span class="text-xs text-slate-500">${escapeHtml(b.mobile)}</span></td><td>${escapeHtml(b.vehicleModel)}<br><span class="text-xs text-slate-500">${escapeHtml(b.vehicleNo)}</span></td><td class="max-w-xs">${escapeHtml(b.itemsSummary||'')}</td><td class="font-bold">${money(b.totalAmount)}</td><td>${escapeHtml(b.paymentMode)}</td><td><div class="flex gap-1.5"><button class="btn btn-light" style="padding:5px 8px" onclick="editBill('${b.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteBill('${b.id}')">Delete</button></div></td></tr>`).join('')}
-function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v||'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
+function filterBills(){const type=$('filter-type').value,query=$('search-query').value.trim().toLowerCase(),now=new Date(),startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);const filtered=allBillsCache.filter(b=>{const d=new Date(b.timestamp\vert{}\vert{}0),match=[b.invoiceNo,b.customerName,b.mobile,b.vehicleNo,b.vehicleModel,b.itemsSummary].some(v=>String(v\vert{}\vert{}'').toLowerCase().includes(query));if(!match)return false;if(type==='daily')return todayKey(d)===today;if(type==='weekly')return d>=startWeek&&d<=now;if(type==='monthly')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();return true});renderHistoryTable(filtered);$('filtered-sales').textContent=money(filtered.reduce((s,b)=>s+Number(b.totalAmount||0),0));$('filtered-count').textContent=filtered.length;$('filtered-credit').textContent=money(filtered.filter(b=>b.paymentMode==='Udhaar').reduce((s,b)=>s+Number(b.totalAmount||0),0))}
 $('filter-type').onchange=filterBills;$('search-query').oninput=filterBills;
-window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile||'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo||'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)||0;currentBillItems=(b.items||[]).map(i=>({...i,price:Number(i.price)||0,qty:Number(i.qty)||1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.remove('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
+window.editBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b)return;editingDocId=b.id;editingOriginal={...b};$('prev-inv-no').textContent=b.invoiceNo;$('prev-date').textContent=b.date;$('cust-name').value=b.customerName||'';$('cust-mobile').value=b.mobile\vert{}\vert{}'';$('vehicle-model').value=b.vehicleModel||'';$('vehicle-no').value=b.vehicleNo\vert{}\vert{}'';$('payment-mode').value=b.paymentMode||'Cash';$('bill-discount').value=Number(b.discount)\vert{}\vert{}0;currentBillItems=(b.items\vert{}\vert{}[]).map(i=>({...i,price:Number(i.price)\vert{}\vert{}0,qty:Number(i.qty)\vert{}\vert{}1}));$('badge-mode').textContent='EDIT '+b.invoiceNo;$('cancel-edit-btn').classList.remove('hidden');$('save-print-btn').textContent='💾 Update Invoice';renderBillItems();setTab('billing')};
 window.deleteBill=async id=>{const b=allBillsCache.find(x=>x.id===id);if(!b||!confirm(`Delete ${b.invoiceNo}?`))return;try{await db.collection('bills').doc(id).delete();await syncBackup({invoiceNo:b.invoiceNo,deletedAt:Date.now()},'delete')}catch(e){alert(e.message)}};
 function renderDashboard(){const sum=arr=>arr.reduce((s,b)=>s+Number(b.totalAmount||0),0),todayBills=allBillsCache.filter(b=>todayKey(b.timestamp||0)===today),monthBills=allBillsCache.filter(b=>{const d=new Date(b.timestamp||0);return d.getMonth()===new Date().getMonth()&&d.getFullYear()===new Date().getFullYear()});$('stat-today').textContent=money(sum(todayBills));$('stat-today-count').textContent=todayBills.length+' bills today';$('stat-month').textContent=money(sum(monthBills));$('stat-bills').textContent=allBillsCache.length;$('stat-stock').textContent=inventoryCache.length;const recent=allBillsCache.slice(0,6);$('recent-bills').innerHTML=recent.length?recent.map(b=>`<tr><td class="font-bold text-blue-600">${escapeHtml(b.invoiceNo)}</td><td>${escapeHtml(b.date||'')}</td><td>${escapeHtml(b.customerName||'')}</td><td>${escapeHtml(b.paymentMode||'')}</td><td class="font-bold">${money(b.totalAmount)}</td></tr>`).join(''):'<tr><td colspan="5" class="text-center text-slate-400 py-6">No bills saved yet</td></tr>'}
 function renderInventory(){const body=$('inventory-table-body');$('inventory-count').textContent=inventoryCache.length;$('inventory-units').textContent=inventoryCache.reduce((s,i)=>s+Math.max(0,Number(i.stock)||0),0);$('inventory-low').textContent=inventoryCache.filter(i=>Number(i.stock)<=5).length;body.innerHTML=inventoryCache.length?inventoryCache.map(i=>`<tr><td class="font-semibold">${escapeHtml(i.name)}</td><td>${money(i.price)}</td><td><span class="${Number(i.stock)<=5?'text-red-600 font-bold':''}">${Number(i.stock)||0}</span></td><td><div class="flex gap-2"><button class="btn btn-light" style="padding:5px 8px" onclick="editStock('${i.id}')">Edit</button><button class="btn btn-danger" style="padding:5px 8px" onclick="deleteStockItem('${i.id}')">Delete</button></div></td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-slate-400 py-6">No inventory items</td></tr>'}

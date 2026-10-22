@@ -21,25 +21,42 @@
     .btn-light { background-color: #e2e8f0; color: #334155; }
     .btn-light:hover { background-color: #cbd5e1; }
 
+    /* Professional A4 Print Styling with Center Alignment & Watermark */
     @media print {
       @page { size: A4; margin: 15mm; }
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
       #print-area {
-        position: absolute; left: 50%; top: 0; transform: translateX(-50%);
-        width: 100%; max-width: 190mm; background: white !important; padding: 10mm;
-        box-shadow: none !important; border: none !important;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 190mm;
+        background: white !important;
+        padding: 10mm;
+        box-shadow: none !important;
+        border: none !important;
       }
       .no-print { display: none !important; }
     }
 
-    .invoice-watermark { position: relative; }
+    /* Watermark Style */
+    .invoice-watermark {
+      position: relative;
+    }
     .invoice-watermark::before {
       content: "ANAYA AUTOMOBILES";
-      position: absolute; top: 50%; left: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%) rotate(-30deg);
-      font-size: 38px; font-weight: 800; color: rgba(15, 23, 42, 0.03);
-      white-space: nowrap; pointer-events: none; z-index: 0;
+      font-size: 38px;
+      font-weight: 800;
+      color: rgba(15, 23, 42, 0.03);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
     }
   </style>
 </head>
@@ -56,7 +73,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Firebase + Sheet + SQL Active</span>
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Sheet Live Sync Active</span>
         <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
       </div>
     </div>
@@ -116,7 +133,7 @@
     <div id="tab-billing" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left: Form Controls (7 Cols) -->
+        <!-- Left: Form Controls -->
         <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div class="flex justify-between items-center border-b border-slate-100 pb-4">
             <div>
@@ -228,11 +245,11 @@
               <span class="text-xs text-slate-500 block">Grand Total</span>
               <span id="bill-grand-total" class="text-2xl font-extrabold text-blue-600">₹0.00</span>
             </div>
-            <button onclick="alert('Bill generated successfully! Inventory stock deducted and synced.')" class="btn btn-primary px-8 py-3 text-base">Save & Sync Bill</button>
+            <button onclick="alert('Bill generated successfully!')" class="btn btn-primary px-8 py-3 text-base">Save & Sync Bill</button>
           </div>
         </div>
 
-        <!-- Right: Live Invoice Print Preview (5 Cols) -->
+        <!-- Right: Live Invoice Print Preview -->
         <div class="lg:col-span-5 bg-slate-100 p-6 rounded-xl border border-slate-200 flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-4">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Tax Invoice Preview</h4>
@@ -307,7 +324,6 @@
           </div>
         </div>
 
-        <!-- Add New Inventory Item Form -->
         <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
           <h4 class="text-xs font-bold uppercase text-slate-600">Add New Spare Part to Inventory</h4>
           <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
@@ -337,7 +353,6 @@
           </div>
         </div>
 
-        <!-- Inventory Table -->
         <div class="overflow-x-auto border border-slate-200 rounded-lg">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
@@ -367,13 +382,13 @@
 
   </main>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- EMBEDDED JAVASCRIPT LOGIC -->
   <script>
     let currentBillItems = [];
     let isGstMode = false;
     window.allBillsCache = [];
 
-    // Master Inventory loaded with the 40 items we populated in Google Sheet
+    // Master Inventory loaded with 40 common car spare parts
     let inventoryMaster = [
       { id: 'PART-001', name: 'Brake Pad', hsn: '8708', pPrice: 800, sPrice: 1200, qty: 25 },
       { id: 'PART-002', name: 'Clutch Plate', hsn: '8708', pPrice: 1500, sPrice: 2200, qty: 15 },
@@ -516,7 +531,6 @@
       renderBillItems();
     }
 
-    // Auto-Suggest Inventory Filter
     function filterInventorySuggestions(query) {
       const box = document.getElementById('inventory-suggestions');
       if (!box) return;
@@ -606,7 +620,6 @@
       return d > 0 ? '-' + money(d) : '₹0.00';
     }
 
-    // Inventory Table Renderer
     function renderInventoryTable() {
       const tbody = document.getElementById('inventory-table-body');
       if (!tbody) return;
@@ -623,7 +636,8 @@
           </td>
         </tr>
       `).join('');
-      document.getElementById('kpi-stock-count').textContent = inventoryMaster.length;
+      const stockCountEl = document.getElementById('kpi-stock-count');
+      if(stockCountEl) stockCountEl.textContent = inventoryMaster.length;
     }
 
     function addNewInventoryItem() {
@@ -661,9 +675,37 @@
       }
     }
 
-    function syncInventoryFromSheet() {
-      alert('🔄 Synced successfully with Google Sheet! All 40+ spare parts loaded.');
-      renderInventoryTable();
+    // Live Connected Sync Function with your Google Apps Script Web App URL
+    async function syncInventoryFromSheet() {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXGNIUNJwjef58VVYq5df_DIVaTm9l9CnXmpFHjn8Yod2lGeMEI_HEBIdYIpMc90dF/exec";
+      const btn = event?.currentTarget;
+      if(btn) btn.textContent = '🔄 Syncing...';
+
+      try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          inventoryMaster = data.map((item, index) => ({
+            id: item['Part ID'] || ('PART-' + String(index + 1).padStart(3, '0')),
+            name: item['Part Name'] || 'Unknown Part',
+            hsn: String(item['HSN Code'] || '8708'),
+            pPrice: Number(item['Purchase Price']) || 0,
+            sPrice: Number(item['Selling Price']) || 0,
+            qty: Number(item['Current Stock Qty']) || 0
+          }));
+          
+          renderInventoryTable();
+          alert('✅ Successfully synced with Google Sheet! Latest inventory loaded.');
+        } else {
+          alert('⚠️ Sheet is empty or data format mismatch.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('❌ Sync failed! Check console or network.');
+      } finally {
+        if(btn) btn.textContent = '🔄 Sync with Sheet';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

@@ -1,419 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anaya Automobiles | Enterprise Executive Dashboard</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for Analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        
-        :root {
-            --navy: #0b1329;
-            --navy-light: #1e293b;
-            --blue: #2563eb;
-            --gold: #f59e0b;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04);
-            border-radius: 16px;
-        }
-
-        .nav-tab {
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #64748b;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-tab:hover {
-            color: #1e293b;
-            background-color: #f1f5f9;
-        }
-
-        .nav-tab.active {
-            background-color: #eff6ff;
-            color: #2563eb;
-            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
-        }
-
-        .stat-card {
-            background: linear-gradient(145deg, #ffffff, #f8fafc);
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anaya Automobiles - Car Market Billing & Inventory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .nav-tab.active { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
+    .field { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; transition: all 0.2s; }
+    .field:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-primary { background-color: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-danger { background-color: #ef4444; color: #ffffff; }
+    .btn-danger:hover { background-color: #dc2626; }
+    .btn-light { background-color: #e2e8f0; color: #334155; }
+    .btn-light:hover { background-color: #cbd5e1; }
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
+      .no-print { display: none !important; }
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col">
 
-    <!-- MAIN APP WRAPPER -->
-    <div class="flex-grow">
-        <!-- TOP EXECUTIVE NAVBAR -->
-        <header class="text-white shadow-lg sticky top-0 z-50" style="background: linear-gradient(110deg, var(--navy), var(--navy-light));">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-                
-                <!-- BRAND LOGO & INFORMATION -->
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-xl shadow-md border border-amber-400/30" style="background: var(--gold); color: var(--navy)">
-                        AA
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="font-black text-lg md:text-xl tracking-tight text-white">Anaya Automobiles</h1>
-                            <span class="text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">Car Market</span>
-                        </div>
-                        <p class="text-xs text-slate-300 font-medium flex items-center gap-2 mt-0.5">
-                            <span><i class="fa-solid fa-location-dot text-amber-400 mr-1"></i>Amarpur Road, Barhi</span>
-                            <span class="hidden sm:inline">·</span>
-                            <span class="hidden sm:inline"><i class="fa-solid fa-phone text-amber-400 mr-1"></i>9893931743, 7999367203</span>
-                        </p>
-                    </div>
-                </div>
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-amber-500 text-slate-950 font-extrabold flex items-center justify-center text-xl shadow">AA</div>
+        <div>
+          <h1 class="text-lg font-bold tracking-wide flex items-center gap-2">Anaya Automobiles <span class="text-amber-400 text-xs font-medium px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">Car Market</span></h1>
+          <p class="text-xs text-slate-400">Amarpur Road, Barhi • Mo: 9893931743, 7999367203</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Firebase + Sheet + SQL Active</span>
+        <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
+      </div>
+    </div>
+  </header>
 
-                <!-- RIGHT ADMIN PROFILE & SYSTEM STATUS -->
-                <div class="flex items-center gap-3">
-                    <div class="hidden md:flex items-center gap-2 bg-slate-800/80 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>System Live</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-slate-800 text-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-700 text-xs font-bold shadow-sm">
-                        <i class="fa-solid fa-user-shield text-amber-400"></i>
-                        <span>Anaya Admin</span>
-                    </div>
-                </div>
-            </div>
-        </header>
+  <!-- NAVIGATION TABS -->
+  <nav class="bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto py-2">
+      <button onclick="switchTab('overview')" class="nav-tab active px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Overview</button>
+      <button onclick="switchTab('billing')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Billing Counter</button>
+      <button onclick="switchTab('reports')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Bills & Reports</button>
+      <button onclick="switchTab('inventory')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Inventory</button>
+      <button onclick="switchTab('analytics')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Analytics & Insights</button>
+      <button onclick="switchTab('khata')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Customer Khata</button>
+    </div>
+  </nav>
 
-        <!-- NAVIGATION TABS & DASHBOARD BODY -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            
-            <!-- MAIN TAB NAVIGATION BAR -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm w-full">
-                <button class="nav-tab active" data-tab="overview">
-                    <i class="fa-solid fa-chart-pie text-blue-600"></i>
-                    <span>Overview</span>
-                </button>
-                <button class="nav-tab" data-tab="billing">
-                    <i class="fa-solid fa-calculator text-blue-600"></i>
-                    <span>Billing Counter</span>
-                </button>
-                <button class="nav-tab" data-tab="history">
-                    <i class="fa-solid fa-file-invoice text-blue-600"></i>
-                    <span>Bills & Reports</span>
-                </button>
-                <button class="nav-tab" data-tab="inventory">
-                    <i class="fa-solid fa-boxes-stacked text-blue-600"></i>
-                    <span>Inventory</span>
-                </button>
-                <button class="nav-tab" data-tab="analytics">
-                    <i class="fa-solid fa-chart-line text-blue-600"></i>
-                    <span>Analytics & Metrics</span>
-                </button>
-                <button class="nav-tab" data-tab="khata">
-                    <i class="fa-solid fa-book-user text-blue-600"></i>
-                    <span>Customer Khata</span>
-                </button>
-            </div>
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
 
-            <!-- SECTION 1: OVERVIEW TAB -->
-            <section id="section-overview" class="space-y-6">
-                
-                <!-- HEADER WELCOME BAR -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-extrabold uppercase tracking-widest text-blue-600">Executive Dashboard</p>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-900 mt-1">Welcome back, Admin 👋</h2>
-                        <p class="text-slate-500 text-sm mt-0.5">Here is your real-time performance summary and shop metrics.</p>
-                    </div>
-                    <div>
-                        <button class="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/20 transition duration-200 flex items-center justify-center gap-2" onclick="switchToTab('billing')">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Create New Bill</span>
-                        </button>
-                    </div>
-                </div>
+    <!-- 1. OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-content active space-y-6">
+      <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
+          <p class="text-sm text-slate-500">Here is your live shop performance and billing summary.</p>
+        </div>
+        <button onclick="switchTab('billing')" class="btn btn-primary">+ Create New Bill</button>
+      </div>
 
-                <!-- KPI STAT CARDS GRID -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                    <!-- Stat 1 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Sales</p>
-                            <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold"><i class="fa-solid fa-arrow-trend-up"></i></span>
-                        </div>
-                        <p id="stat-today" class="text-2xl font-black text-slate-900 mt-2">₹0.00</p>
-                        <p id="stat-today-count" class="text-xs font-semibold text-emerald-600 mt-1">0 bills today</p>
-                    </div>
-
-                    <!-- Stat 2 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Monthly Sales</p>
-                            <span class="p-2 rounded-lg bg-blue-50 text-blue-600 text-xs font-bold"><i class="fa-solid fa-calendar-days"></i></span>
-                        </div>
-                        <p id="stat-month" class="text-2xl font-black text-slate-900 mt-2">₹0.00</p>
-                        <p class="text-xs font-semibold text-slate-500 mt-1">Current month total</p>
-                    </div>
-
-                    <!-- Stat 3 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Saved Bills</p>
-                            <span class="p-2 rounded-lg bg-purple-50 text-purple-600 text-xs font-bold"><i class="fa-solid fa-receipt"></i></span>
-                        </div>
-                        <p id="stat-bills" class="text-2xl font-black text-slate-900 mt-2">0</p>
-                        <p class="text-xs font-semibold text-slate-500 mt-1">Cloud synced</p>
-                    </div>
-
-                    <!-- Stat 4 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Stock Parts</p>
-                            <span class="p-2 rounded-lg bg-amber-50 text-amber-600 text-xs font-bold"><i class="fa-solid fa-boxes-stacked"></i></span>
-                        </div>
-                        <p id="stat-stock" class="text-2xl font-black text-slate-900 mt-2">0</p>
-                        <p class="text-xs font-semibold text-slate-500 mt-1">Active inventory</p>
-                    </div>
-
-                    <!-- Stat 5 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Udhaar Credit</p>
-                            <span class="p-2 rounded-lg bg-red-50 text-red-600 text-xs font-bold"><i class="fa-solid fa-hand-holding-dollar"></i></span>
-                        </div>
-                        <p id="stat-udhaar" class="text-2xl font-black text-red-600 mt-2">₹0.00</p>
-                        <p class="text-xs font-semibold text-red-500 mt-1">Pending recovery</p>
-                    </div>
-
-                    <!-- Stat 6 -->
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start">
-                            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Top Spare Part</p>
-                            <span class="p-2 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold"><i class="fa-solid fa-crown"></i></span>
-                        </div>
-                        <p id="stat-top-item" class="text-base font-black text-slate-900 mt-2 truncate">N/A</p>
-                        <p class="text-xs font-semibold text-indigo-600 mt-1">Most sold item</p>
-                    </div>
-                </div>
-
-                <!-- RECENT TRANSACTIONS TABLE -->
-                <div class="glass-card p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-                        <div>
-                            <h3 class="font-extrabold text-lg text-slate-900">Recent Transactions</h3>
-                            <p class="text-xs text-slate-500">Latest 6 billing records across all sales channels</p>
-                        </div>
-                        <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2" onclick="switchToTab('history')">
-                            <span>View All History</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[650px]">
-                            <thead>
-                                <tr class="border-b border-slate-200 bg-slate-50/50">
-                                    <th class="py-3 px-4 text-xs font-extrabold uppercase text-slate-500 tracking-wider">Invoice #</th>
-                                    <th class="py-3 px-4 text-xs font-extrabold uppercase text-slate-500 tracking-wider">Date</th>
-                                    <th class="py-3 px-4 text-xs font-extrabold uppercase text-slate-500 tracking-wider">Customer Name</th>
-                                    <th class="py-3 px-4 text-xs font-extrabold uppercase text-slate-500 tracking-wider">Payment Mode</th>
-                                    <th class="py-3 px-4 text-xs font-extrabold uppercase text-slate-500 tracking-wider text-right">Total Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-bills-body" class="divide-y divide-slate-100 text-sm">
-                                <tr>
-                                    <td colspan="5" class="text-center text-slate-400 py-8 font-medium">
-                                        <i class="fa-solid fa-spinner animate-spin mr-2"></i> Loading transactions...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 2: BILLING COUNTER (POS) - PLACEHOLDER FOR PART 2 -->
-            <section id="section-billing" class="hidden glass-card p-8">
-                <div class="text-center py-12 space-y-4">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
-                        <i class="fa-solid fa-calculator"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-900">Billing Counter Engine</h3>
-                    <p class="text-slate-500 max-w-md mx-auto text-sm">Part 1 - POS Engine ready to be attached next.</p>
-                </div>
-            </section>
-
-            <!-- SECTION 3: BILLS & REPORTS - PLACEHOLDER -->
-            <section id="section-history" class="hidden glass-card p-8">
-                <div class="text-center py-12 space-y-4">
-                    <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-900">Bills & Reports Engine</h3>
-                    <p class="text-slate-500 max-w-md mx-auto text-sm">Full history search, filtering, and print manager ready to attach.</p>
-                </div>
-            </section>
-
-            <!-- SECTION 4: INVENTORY - PLACEHOLDER -->
-            <section id="section-inventory" class="hidden glass-card p-8">
-                <div class="text-center py-12 space-y-4">
-                    <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
-                        <i class="fa-solid fa-boxes-stacked"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-900">Inventory Management System</h3>
-                    <p class="text-slate-500 max-w-md mx-auto text-sm">Stock management and auto-complete pricing module ready to attach.</p>
-                </div>
-            </section>
-
-            <!-- SECTION 5: ANALYTICS & METRICS -->
-            <section id="section-analytics" class="hidden space-y-6">
-                <div class="glass-card p-6">
-                    <h3 class="font-extrabold text-lg text-slate-900 mb-1">Interactive Analytics & Power Metrics</h3>
-                    <p class="text-xs text-slate-500 mb-6">Real-time data visualization from backup records</p>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <h4 class="font-bold text-sm text-slate-800 mb-4">Monthly Sales Trend</h4>
-                            <div class="h-64 flex items-center justify-center text-slate-400 text-sm">
-                                <canvas id="monthlySalesChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="p-4 rounded-xl border border-slate-200 bg-white">
-                            <h4 class="font-bold text-sm text-slate-800 mb-4">Payment Methods Breakdown</h4>
-                            <div class="h-64 flex items-center justify-center text-slate-400 text-sm">
-                                <canvas id="paymentModeChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 6: CUSTOMER KHATA - PLACEHOLDER -->
-            <section id="section-khata" class="hidden glass-card p-8">
-                <div class="text-center py-12 space-y-4">
-                    <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
-                        <i class="fa-solid fa-book-user"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-900">Customer Udhaar / Khata Directory</h3>
-                    <p class="text-slate-500 max-w-md mx-auto text-sm">Per-customer transaction statement & credit ledger.</p>
-                </div>
-            </section>
-
-        </main>
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Today's Sales</p>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">₹0</h3>
+          <p class="text-xs text-blue-600 mt-1">0 bills generated today</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">This Month's Sales</p>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">₹0</h3>
+          <p class="text-xs text-slate-500 mt-1">Accumulated revenue</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Saved Bills</p>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Synced with Firebase & Sheet</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Stock Items</p>
+          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Active inventory parts</p>
+        </div>
+      </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 font-medium mt-8">
-        <p>© 2026 Anaya Automobiles — Amarpur Road, Barhi. Powered by Enterprise Billing Suite.</p>
-    </footer>
+    <!-- 2. BILLING COUNTER TAB -->
+    <div id="tab-billing" class="tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Form Controls (7 Cols) -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Billing Counter</h3>
+              <p class="text-xs text-slate-500">Create invoice & trigger auto-backup</p>
+            </div>
+            <!-- GST Toggle Button -->
+            <button id="gst-toggle-btn" onclick="toggleGstMode()" class="btn btn-light text-xs font-bold">⚡ Mode: Regular Bill (No GST)</button>
+          </div>
 
-    <!-- INTERACTIVE NAVIGATION LOGIC -->
-    <script>
-        // Tab Switch Functionality
-        function switchToTab(tabId) {
-            // Hide all section elements
-            const sections = ['overview', 'billing', 'history', 'inventory', 'analytics', 'khata'];
-            sections.forEach(s => {
-                const el = document.getElementById('section-' + s);
-                if (el) el.classList.add('hidden');
-            });
+          <!-- Udhaar Warning Banner -->
+          <div id="udhaar-alert-box" class="hidden p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm font-medium"></div>
 
-            // Remove active class from all buttons
-            document.querySelectorAll('.nav-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
+          <!-- Customer & Vehicle Info -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Customer Name</label>
+              <input id="cust-name" class="field" value="Walk-in Customer" placeholder="Enter customer name">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Mobile Number (Udhaar Lookup)</label>
+              <input id="cust-mobile" class="field" placeholder="10-digit mobile number" maxlength="10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Vehicle Model</label>
+              <input id="vehicle-model" class="field" placeholder="e.g. Swift, Scorpio, Brezza">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Vehicle / Car Number</label>
+              <input id="vehicle-no" class="field uppercase" placeholder="e.g. MP21AB1234">
+            </div>
+          </div>
 
-            // Show selected section
-            const targetSection = document.getElementById('section-' + tabId);
-            if (targetSection) {
-                targetSection.classList.remove('hidden');
-            }
+          <!-- GST Extra Fields (Hidden by default) -->
+          <div id="gst-extra-fields" class="hidden p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
+            <h4 class="text-xs font-bold uppercase text-slate-500">GST Invoice Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Customer GSTIN</label>
+                <input id="cust-gstin" class="field uppercase" placeholder="23AAAAA0000A1Z5">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Tax Rate</label>
+                <select id="gst-rate-select" class="field" onchange="updatePreview()">
+                  <option value="18">18% GST (CGST 9% + SGST 9%)</option>
+                  <option value="12">12% GST (CGST 6% + SGST 6%)</option>
+                  <option value="28">28% GST (CGST 14% + SGST 14%)</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-            // Set active class on active button
-            const activeBtn = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
-            if (activeBtn) {
-                activeBtn.classList.add('active');
-            }
-        }
+          <!-- Add Spare Parts Section -->
+          <div class="border-t border-slate-100 pt-4 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Spare Parts</h4>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+              <div class="md:col-span-5">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Part Name / Description</label>
+                <input id="item-name" class="field" placeholder="e.g. Brake Pad / Clutch Plate">
+              </div>
+              <div class="md:col-span-3">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Price (₹)</label>
+                <input id="item-price" type="number" class="field" placeholder="0.00" min="0">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Qty</label>
+                <input id="item-qty" type="number" class="field" value="1" min="1">
+              </div>
+              <div class="md:col-span-2">
+                <button id="add-item-btn" class="btn btn-primary w-full">+ Add</button>
+              </div>
+            </div>
+          </div>
 
-        // Add Click Listeners to Nav Tabs
-        document.querySelectorAll('.nav-tab').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.getAttribute('data-tab');
-                switchToTab(tab);
-            });
-        });
+          <!-- Items Table -->
+          <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                <tr>
+                  <th class="p-3">Part Name</th>
+                  <th class="p-3">Price</th>
+                  <th class="p-3">Qty</th>
+                  <th class="p-3">Total</th>
+                  <th class="p-3">Action</th>
+                </tr>
+              </thead>
+              <tbody id="bill-items-body" class="divide-y divide-slate-200">
+                <tr><td colspan="5" class="text-center text-slate-400 py-6">No items added yet</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-        // Mock Sample Transactions for Initial View Verification
-        document.addEventListener('DOMContentLoaded', () => {
-            const sampleData = [
-                { id: 'INV-1005', date: '22 Oct 2026', name: 'Rahul Sharma', mode: 'UPI - Ayush', total: '₹3,450.00' },
-                { id: 'INV-1004', date: '22 Oct 2026', name: 'Vikram Singh', mode: 'Cash', total: '₹1,200.00' },
-                { id: 'INV-1003', date: '21 Oct 2026', name: 'Anil Kumar', mode: 'Udhaar', total: '₹5,800.00' },
-                { id: 'INV-1002', date: '21 Oct 2026', name: 'Suresh Patel', mode: 'UPI - Anaya automobiles', total: '₹850.00' },
-                { id: 'INV-1001', date: '20 Oct 2026', name: 'Walk-in Customer', mode: 'Cash', total: '₹2,100.00' }
-            ];
+          <!-- Discount & Payment Mode -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Discount (₹)</label>
+              <input id="bill-discount" type="number" class="field" value="0" min="0">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Payment Mode</label>
+              <select id="payment-mode" class="field font-semibold">
+                <option value="Cash">Cash</option>
+                <option value="UPI - Ayush">UPI - Ayush</option>
+                <option value="UPI - Ankur">UPI - Ankur</option>
+                <option value="UPI - Anaya Automobiles">UPI - Anaya Automobiles</option>
+                <option value="Udhaar">Udhaar (Credit)</option>
+              </select>
+            </div>
+          </div>
 
-            const tbody = document.getElementById('recent-bills-body');
-            if (tbody) {
-                tbody.innerHTML = sampleData.map(row => `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-3 px-4 font-bold text-blue-600">${row.id}</td>
-                        <td class="py-3 px-4 text-slate-600">${row.date}</td>
-                        <td class="py-3 px-4 font-semibold text-slate-800">${row.name}</td>
-                        <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${
-                                row.mode === 'Udhaar' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                            }">${row.mode}</span>
-                        </td>
-                        <td class="py-3 px-4 font-black text-slate-900 text-right">${row.total}</td>
-                    </tr>
-                `).join('');
-            }
-        });
-    </script>
+          <!-- Grand Total & Save Button -->
+          <div class="flex justify-between items-center pt-4 border-t border-slate-200">
+            <div>
+              <span class="text-xs text-slate-500 block">Grand Total</span>
+              <span id="bill-grand-total" class="text-2xl font-extrabold text-blue-600">₹0.00</span>
+            </div>
+            <button onclick="alert('Module ready. Backend backup sync will run upon final save.')" class="btn btn-primary px-8 py-3 text-base">Save & Sync Bill</button>
+          </div>
+        </div>
+
+        <!-- Right: Live Invoice Print Preview (5 Cols) -->
+        <div class="lg:col-span-5 bg-slate-100 p-6 rounded-xl border border-slate-200 flex flex-col items-center">
+          <div class="w-full flex justify-between items-center mb-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Tax Invoice Preview</h4>
+            <button onclick="window.print()" class="btn btn-light text-xs">🖨️ Print / PDF</button>
+          </div>
+
+          <!-- Printable Invoice Box -->
+          <div id="print-area" class="bg-white w-full max-w-md p-6 rounded-lg shadow-sm border border-slate-200 text-slate-900 space-y-4 text-xs">
+            <div class="text-center border-b border-slate-200 pb-3">
+              <h2 class="text-base font-extrabold text-slate-900">ANAYA AUTOMOBILES</h2>
+              <p class="text-slate-500">Car Market, Amarpur Road, Barhi</p>
+              <p class="text-slate-500">Mo: 9893931743, 7999367203</p>
+              <h3 class="text-xs font-bold mt-2 px-2 py-0.5 bg-slate-100 inline-block rounded">TAX INVOICE / CASH MEMO</h3>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[11px] border-b border-slate-200 pb-3">
+              <div><b>Customer:</b> <span id="prev-cust-name">Walk-in</span></div>
+              <div><b>Mobile:</b> <span id="prev-cust-mobile">N/A</span></div>
+              <div><b>Vehicle:</b> <span id="prev-vehicle-model">-</span></div>
+              <div><b>Vehicle No:</b> <span id="prev-vehicle-no">-</span></div>
+            </div>
+
+            <!-- Preview Items Table -->
+            <table class="w-full text-left text-[11px] border-collapse">
+              <thead>
+                <tr class="border-b border-slate-300">
+                  <th class="py-1">Item</th>
+                  <th class="py-1">Price</th>
+                  <th class="py-1">Qty</th>
+                  <th class="py-1 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="prev-items-body" class="divide-y divide-slate-100">
+                <tr><td colspan="4" class="text-center py-3 text-slate-400">No items yet</td></tr>
+              </tbody>
+            </table>
+
+            <!-- Summary Totals -->
+            <div class="border-t border-slate-200 pt-2 space-y-1">
+              <div class="flex justify-between"><span>Subtotal</span><span id="prev-subtotal">₹0.00</span></div>
+              <div class="flex justify-between"><span>Discount</span><span id="prev-discount">₹0.00</span></div>
+              <div id="prev-tax-breakdown" class="hidden space-y-1"></div>
+              <div class="flex justify-between font-bold text-sm border-t border-slate-200 pt-1">
+                <span>Grand Total</span><span id="prev-total">₹0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-500 pt-1">
+                <span>Payment Mode</span><span id="prev-pay-mode" class="font-medium">Cash</span>
+              </div>
+            </div>
+
+            <div class="text-center pt-4 border-t border-dashed border-slate-200 text-[10px] text-slate-400">
+              <p>Thank you for doing business with Anaya Automobiles!</p>
+              <p class="mt-1 font-semibold">Authorised Signatory</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. REPORTS TAB -->
+    <div id="tab-reports" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Bills & Reports History</h3><p class="text-slate-500 text-sm mt-1">All generated invoices will appear here.</p></div></div>
+
+    <!-- 4. INVENTORY TAB -->
+    <div id="tab-inventory" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Inventory Management</h3><p class="text-slate-500 text-sm mt-1">Manage spare parts stock and pricing.</p></div></div>
+
+    <!-- 5. ANALYTICS TAB -->
+    <div id="tab-analytics" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Analytics & Insights</h3><p class="text-slate-500 text-sm mt-1">24/7 automated performance metrics and charts.</p></div></div>
+
+    <!-- 6. KHATA TAB -->
+    <div id="tab-khata" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Customer Khata (Udhaar Register)</h3><p class="text-slate-500 text-sm mt-1">Track pending credits and customer ledgers.</p></div></div>
+
+  </main>
+
+  <!-- JAVASCRIPT LINKING -->
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+  </script>
+  <script src="billing.js"></script>
 </body>
 </html>

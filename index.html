@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet Sync Active</span>
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet & Auto-Email Active</span>
         <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
       </div>
     </div>
@@ -80,7 +80,7 @@
       <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <h2 class="text-2xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
-          <p class="text-sm text-slate-500">Inventory sheet & Bills backup sheet are securely linked.</p>
+          <p class="text-sm text-slate-500">Inventory sheet & Bills backup sheet with auto-email shoot are online.</p>
         </div>
         <button onclick="switchTab('billing')" class="btn btn-primary">+ Create New Bill</button>
       </div>
@@ -116,7 +116,7 @@
           <div class="flex justify-between items-center border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-lg font-bold text-slate-900">Billing Counter</h3>
-              <p class="text-xs text-slate-500">Auto backup to Anaya Automobiles Bills Sheet</p>
+              <p class="text-xs text-slate-500">Auto backup & email shoot enabled</p>
             </div>
             <button id="gst-toggle-btn" onclick="toggleGstMode()" class="btn btn-light text-xs font-bold">⚡ Mode: Regular Bill (No GST)</button>
           </div>
@@ -219,7 +219,7 @@
               <span class="text-xs text-slate-500 block">Grand Total</span>
               <span id="bill-grand-total" class="text-2xl font-extrabold text-blue-600">₹0.00</span>
             </div>
-            <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save & Sync to Bills Sheet</button>
+            <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save, Sync & Shoot Email</button>
           </div>
         </div>
 
@@ -319,7 +319,7 @@
                 <th class="p-3">Items Summary</th>
                 <th class="p-3 text-right">Total (₹)</th>
                 <th class="p-3">Payment</th>
-                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="reports-table-body" class="divide-y divide-slate-200">
@@ -540,7 +540,6 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Seperate Web App URLs
     const INVENTORY_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8yJianDnL6MX8ZYg79m2Hb4EcBWUIym64wHJPhkMGouYoJeQ98vtlWkNbjuTs_r0g/exec";
     const BILLS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxTzAtx_SW9W2QSX6-XuO6XNRjc7vjFe89Fet85rhQ7P6COGozRONhw-9Chf36pqsysQ/exec";
 
@@ -561,7 +560,11 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
       document.getElementById('tab-' + tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
+      const tabs = document.querySelectorAll('.nav-tab');
+      tabs.forEach(t => {
+        if(t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
+      });
+
       if (tabId === 'inventory') renderInventoryTable();
       if (tabId === 'reports') loadBillsHistory();
       if (tabId === 'ledger') loadPartyLedger();
@@ -849,14 +852,9 @@
 
       savedBillsList.unshift(newBill);
       if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
-      
-      // Update Udhaar KPI if applicable
-      const totalUdhaar = savedBillsList.filter(b => b.paymentMode === 'Udhaar').reduce((s, b) => s + b.grandTotal, 0);
-      if(document.getElementById('kpi-udhaar-total')) document.getElementById('kpi-udhaar-total').textContent = money(totalUdhaar);
 
-      alert(`✅ Bill ${invoiceId} generated & securely backed up in Bills Sheet!`);
+      alert(`✅ Bill ${invoiceId} saved to sheet & email triggered!`);
 
-      // Send to Anaya Automobiles Bills Sheet
       try {
         await fetch(BILLS_WEB_APP_URL, {
           method: 'POST',
@@ -891,7 +889,7 @@
         return;
       }
 
-      tbody.innerHTML = savedBillsList.map(b => `
+      tbody.innerHTML = savedBillsList.map((b, idx) => `
         <tr class="hover:bg-slate-50 transition-colors">
           <td class="p-3 font-mono text-xs font-bold text-blue-600">${b['Invoice No'] || b.invoiceId}</td>
           <td class="p-3 text-xs text-slate-500">${b.Date || b.date}</td>
@@ -900,7 +898,10 @@
           <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
           <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
-          <td class="p-3 text-center text-xs font-bold text-emerald-600">${b['PDF Link / Status'] || 'Saved & Synced'}</td>
+          <td class="p-3 text-center flex items-center justify-center gap-2">
+            <button onclick="editBillToCounter(${idx})" class="btn btn-light text-xs" style="padding:4px 8px;">✏️ Edit</button>
+            <button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button>
+          </td>
         </tr>
       `).join('');
 
@@ -914,6 +915,25 @@
       if(document.getElementById('kpi-udhaar-total')) document.getElementById('kpi-udhaar-total').textContent = money(totalUdhaar);
     }
 
+    function editBillToCounter(idx) {
+      const b = savedBillsList[idx];
+      if (!b) return;
+
+      document.getElementById('cust-name').value = b['Customer Name'] || b.custName || '';
+      document.getElementById('cust-mobile').value = b['Mobile Number'] || b.custMobile || '';
+      document.getElementById('payment-mode').value = b['Payment Mode'] || b.paymentMode || 'Cash';
+      
+      if (b.items && Array.isArray(b.items)) {
+        currentBillItems = [...b.items];
+      } else {
+        currentBillItems = [];
+      }
+
+      renderBillItems();
+      switchTab('billing');
+      alert(`✏️ Bill ${b['Invoice No'] || b.invoiceId} loaded into Billing Counter!`);
+    }
+
     function filterReports(query) {
       const q = query.trim().toLowerCase();
       const tbody = document.getElementById('reports-table-body');
@@ -924,7 +944,7 @@
         String(b['Invoice No'] || b.invoiceId || '').toLowerCase().includes(q)
       );
       if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No matching bills found</td></tr>'; return; }
-      tbody.innerHTML = filtered.map(b => `
+      tbody.innerHTML = filtered.map((b, idx) => `
         <tr class="hover:bg-slate-50 transition-colors">
           <td class="p-3 font-mono text-xs font-bold text-blue-600">${b['Invoice No'] || b.invoiceId}</td>
           <td class="p-3 text-xs text-slate-500">${b.Date || b.date}</td>
@@ -933,17 +953,18 @@
           <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
           <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
-          <td class="p-3 text-center text-xs font-bold text-emerald-600">${b['PDF Link / Status'] || 'Synced'}</td>
+          <td class="p-3 text-center flex items-center justify-center gap-2">
+            <button onclick="editBillToCounter(${idx})" class="btn btn-light text-xs" style="padding:4px 8px;">✏️ Edit</button>
+            <button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button>
+          </td>
         </tr>
       `).join('');
     }
 
-    // Party Ledger Logic
     async function loadPartyLedger() {
       const tbody = document.getElementById('ledger-table-body');
       if (!tbody) return;
       
-      // Group bills by customer mobile
       let parties = {};
       savedBillsList.forEach(b => {
         let mob = b['Mobile Number'] || b.custMobile || 'N/A';
@@ -987,7 +1008,6 @@
       });
     }
 
-    // GST Refill Docs Logic
     function loadGstReport() {
       const tbody = document.getElementById('gst-table-body');
       if (!tbody) return;
@@ -1004,7 +1024,7 @@
       let taxableSum = 0, taxSum = 0, grossSum = 0;
       tbody.innerHTML = gstBills.map(b => {
         let amt = Number(b['Total Amount (₹)'] || b.grandTotal || 0);
-        let tax = amt * 0.18 / 1.18; // approx breakdown
+        let tax = amt * 0.18 / 1.18;
         let taxable = amt - tax;
         taxableSum += taxable;
         taxSum += tax;
@@ -1027,7 +1047,6 @@
       if(document.getElementById('gst-gross-sum')) document.getElementById('gst-gross-sum').textContent = money(grossSum);
     }
 
-    // Credit / Debit Notes Logic
     function issueCreditDebitNote() {
       const type = document.getElementById('note-type').value;
       const inv = document.getElementById('note-inv').value.trim() || 'INV-GENERAL';

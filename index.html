@@ -20,11 +20,43 @@
     .btn-danger:hover { background-color: #dc2626; }
     .btn-light { background-color: #e2e8f0; color: #334155; }
     .btn-light:hover { background-color: #cbd5e1; }
+
+    /* Professional A4 Print Styling with Center Alignment & Watermark */
     @media print {
+      @page { size: A4; margin: 15mm; }
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
-      #print-area { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
+      #print-area {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 190mm;
+        background: white !important;
+        padding: 10mm;
+        box-shadow: none !important;
+        border: none !important;
+      }
       .no-print { display: none !important; }
+    }
+
+    /* Watermark Style */
+    .invoice-watermark {
+      position: relative;
+    }
+    .invoice-watermark::before {
+      content: "ANAYA AUTOMOBILES";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 38px;
+      font-weight: 800;
+      color: rgba(15, 23, 42, 0.03);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
     }
   </style>
 </head>
@@ -229,16 +261,16 @@
             <button onclick="window.print()" class="btn btn-light text-xs">🖨️ Print / PDF</button>
           </div>
 
-          <!-- Printable Invoice Box -->
-          <div id="print-area" class="bg-white w-full max-w-md p-6 rounded-lg shadow-sm border border-slate-200 text-slate-900 space-y-4 text-xs">
-            <div class="text-center border-b border-slate-200 pb-3">
+          <!-- Printable Invoice Box with Watermark -->
+          <div id="print-area" class="invoice-watermark bg-white w-full max-w-md p-6 rounded-lg shadow-sm border border-slate-200 text-slate-900 space-y-4 text-xs">
+            <div class="text-center border-b border-slate-200 pb-3 relative z-10">
               <h2 class="text-base font-extrabold text-slate-900">ANAYA AUTOMOBILES</h2>
               <p class="text-slate-500">Car Market, Amarpur Road, Barhi</p>
               <p class="text-slate-500">Mo: 9893931743, 7999367203</p>
-              <h3 class="text-xs font-bold mt-2 px-2 py-0.5 bg-slate-100 inline-block rounded">TAX INVOICE / CASH MEMO</h3>
+              <h3 id="prev-invoice-title" class="text-xs font-bold mt-2 px-2 py-0.5 bg-slate-100 inline-block rounded">TAX INVOICE / CASH MEMO</h3>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 text-[11px] border-b border-slate-200 pb-3">
+            <div class="grid grid-cols-2 gap-2 text-[11px] border-b border-slate-200 pb-3 relative z-10">
               <div><b>Customer:</b> <span id="prev-cust-name">Walk-in</span></div>
               <div><b>Mobile:</b> <span id="prev-cust-mobile">N/A</span></div>
               <div><b>Vehicle:</b> <span id="prev-vehicle-model">-</span></div>
@@ -246,7 +278,7 @@
             </div>
 
             <!-- Preview Items Table -->
-            <table class="w-full text-left text-[11px] border-collapse">
+            <table class="w-full text-left text-[11px] border-collapse relative z-10">
               <thead>
                 <tr class="border-b border-slate-300">
                   <th class="py-1">Item</th>
@@ -261,7 +293,7 @@
             </table>
 
             <!-- Summary Totals -->
-            <div class="border-t border-slate-200 pt-2 space-y-1">
+            <div class="border-t border-slate-200 pt-2 space-y-1 relative z-10">
               <div class="flex justify-between"><span>Subtotal</span><span id="prev-subtotal">₹0.00</span></div>
               <div class="flex justify-between"><span>Discount</span><span id="prev-discount">₹0.00</span></div>
               <div id="prev-tax-breakdown" class="hidden space-y-1"></div>
@@ -273,7 +305,7 @@
               </div>
             </div>
 
-            <div class="text-center pt-4 border-t border-dashed border-slate-200 text-[10px] text-slate-400">
+            <div class="text-center pt-4 border-t border-dashed border-slate-200 text-[10px] text-slate-400 relative z-10">
               <p>Thank you for doing business with Anaya Automobiles!</p>
               <p class="mt-1 font-semibold">Authorised Signatory</p>
             </div>
@@ -297,7 +329,7 @@
 
   </main>
 
-  <!-- JAVASCRIPT LOGIC EMBEDDED DIRECTLY -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     let currentBillItems = [];
     let isGstMode = false;
@@ -317,16 +349,19 @@
       isGstMode = !isGstMode;
       const btn = document.getElementById('gst-toggle-btn');
       const gstSection = document.getElementById('gst-extra-fields');
+      const invoiceTitle = document.getElementById('prev-invoice-title');
       
       if (btn) {
         if (isGstMode) {
           btn.textContent = '⚡ Mode: GST Invoice (ON)';
           btn.className = 'btn btn-primary text-xs font-bold';
           if(gstSection) gstSection.classList.remove('hidden');
+          if(invoiceTitle) invoiceTitle.textContent = 'GST TAX INVOICE';
         } else {
           btn.textContent = '⚡ Mode: Regular Bill (No GST)';
           btn.className = 'btn btn-light text-xs font-bold';
           if(gstSection) gstSection.classList.add('hidden');
+          if(invoiceTitle) invoiceTitle.textContent = 'TAX INVOICE / CASH MEMO';
         }
       }
       renderBillItems();
@@ -436,7 +471,7 @@
       
       if(document.getElementById('bill-grand-total')) document.getElementById('bill-grand-total').textContent = money(total);
       if(document.getElementById('prev-subtotal')) document.getElementById('prev-subtotal').textContent = money(sub);
-      if(document.getElementById('prev-discount')) document.getElementById('prev-discount').textContent = money(discount);
+      if(document.getElementById('prev-discount')) document.getElementById('prev-discount').textContent = money(printDiscountFormat(discount));
       
       const taxBreakdownEl = document.getElementById('prev-tax-breakdown');
       if (taxBreakdownEl) {
@@ -452,6 +487,10 @@
         }
       }
       if(document.getElementById('prev-total')) document.getElementById('prev-total').textContent = money(total);
+    }
+
+    function printDiscountFormat(d) {
+      return d > 0 ? '-' + money(d) : '₹0.00';
     }
 
     document.addEventListener('DOMContentLoaded', () => {

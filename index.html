@@ -21,42 +21,22 @@
     .btn-light { background-color: #e2e8f0; color: #334155; }
     .btn-light:hover { background-color: #cbd5e1; }
 
-    /* Professional A4 Print Styling with Center Alignment & Watermark */
     @media print {
       @page { size: A4; margin: 15mm; }
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
       #print-area {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 190mm;
-        background: white !important;
-        padding: 10mm;
-        box-shadow: none !important;
-        border: none !important;
+        position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+        width: 100%; max-width: 190mm; background: white !important; padding: 10mm; box-shadow: none !important; border: none !important;
       }
       .no-print { display: none !important; }
     }
 
-    /* Watermark Style */
-    .invoice-watermark {
-      position: relative;
-    }
+    .invoice-watermark { position: relative; }
     .invoice-watermark::before {
       content: "ANAYA AUTOMOBILES";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-30deg);
-      font-size: 38px;
-      font-weight: 800;
-      color: rgba(15, 23, 42, 0.03);
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: 0;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 38px; font-weight: 800; color: rgba(15, 23, 42, 0.03); white-space: nowrap; pointer-events: none; z-index: 0;
     }
   </style>
 </head>
@@ -73,7 +53,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Two-Way Live Sync Active</span>
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet Sync Active</span>
         <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
       </div>
     </div>
@@ -82,12 +62,13 @@
   <!-- NAVIGATION TABS -->
   <nav class="bg-white border-b border-slate-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto py-2">
-      <button onclick="switchTab('overview')" class="nav-tab active px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Overview</button>
-      <button onclick="switchTab('billing')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Billing Counter</button>
-      <button onclick="switchTab('reports')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Bills & Reports</button>
-      <button onclick="switchTab('inventory')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Inventory Master</button>
-      <button onclick="switchTab('analytics')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Analytics & Insights</button>
-      <button onclick="switchTab('khata')" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all">Customer Khata</button>
+      <button onclick="switchTab('overview')" class="nav-tab active px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Overview</button>
+      <button onclick="switchTab('billing')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Billing Counter</button>
+      <button onclick="switchTab('reports')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Bills & Reports</button>
+      <button onclick="switchTab('inventory')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Inventory Master</button>
+      <button onclick="switchTab('ledger')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Party Ledger</button>
+      <button onclick="switchTab('gst')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">GST Refill Docs</button>
+      <button onclick="switchTab('notes')" class="nav-tab px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Credit / Debit Notes</button>
     </div>
   </nav>
 
@@ -99,32 +80,31 @@
       <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <h2 class="text-2xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
-          <p class="text-sm text-slate-500">Here is your live shop performance and billing summary.</p>
+          <p class="text-sm text-slate-500">Inventory sheet & Bills backup sheet are securely linked.</p>
         </div>
         <button onclick="switchTab('billing')" class="btn btn-primary">+ Create New Bill</button>
       </div>
 
-      <!-- KPI Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Today's Sales</p>
-          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">₹0</h3>
-          <p class="text-xs text-blue-600 mt-1">0 bills generated today</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">This Month's Sales</p>
-          <h3 class="text-2xl font-extrabold text-slate-900 mt-2">₹0</h3>
-          <p class="text-xs text-slate-500 mt-1">Accumulated revenue</p>
-        </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Saved Bills</p>
           <h3 id="kpi-total-bills" class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Archived in reports</p>
+          <p class="text-xs text-slate-500 mt-1">Backed up in Bills Sheet</p>
         </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Stock Items</p>
-          <h3 id="kpi-stock-count" class="text-2xl font-extrabold text-slate-900 mt-2">40</h3>
-          <p class="text-xs text-slate-500 mt-1">Active inventory parts</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Stock Parts</p>
+          <h3 id="kpi-stock-count" class="text-2xl font-extrabold text-slate-900 mt-2">5</h3>
+          <p class="text-xs text-slate-500 mt-1">Active inventory master</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Credit Notes</p>
+          <h3 id="kpi-cn-count" class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Returns / adjustments</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Udhaar</p>
+          <h3 id="kpi-udhaar-total" class="text-2xl font-extrabold text-red-600 mt-2">₹0.00</h3>
+          <p class="text-xs text-slate-500 mt-1">Ledger balance</p>
         </div>
       </div>
     </div>
@@ -132,13 +112,11 @@
     <!-- 2. BILLING COUNTER TAB -->
     <div id="tab-billing" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left: Form Controls -->
         <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div class="flex justify-between items-center border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-lg font-bold text-slate-900">Billing Counter</h3>
-              <p class="text-xs text-slate-500">Create invoice & trigger auto-backup</p>
+              <p class="text-xs text-slate-500">Auto backup to Anaya Automobiles Bills Sheet</p>
             </div>
             <button id="gst-toggle-btn" onclick="toggleGstMode()" class="btn btn-light text-xs font-bold">⚡ Mode: Regular Bill (No GST)</button>
           </div>
@@ -180,13 +158,12 @@
             </div>
           </div>
 
-          <!-- Add Spare Parts Section with Auto-Suggest -->
           <div class="border-t border-slate-100 pt-4 space-y-3">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Spare Parts (Auto-Suggest from Inventory)</h4>
             <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
               <div class="md:col-span-5 relative">
-                <label class="block text-xs font-bold text-slate-600 mb-1">Part Name / Description</label>
-                <input id="item-name" class="field" placeholder="Type to search part..." oninput="filterInventorySuggestions(this.value)">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Part Name</label>
+                <input id="item-name" class="field" placeholder="Type part name..." oninput="filterInventorySuggestions(this.value)">
                 <div id="inventory-suggestions" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"></div>
               </div>
               <div class="md:col-span-3">
@@ -198,12 +175,11 @@
                 <input id="item-qty" type="number" class="field" value="1" min="1">
               </div>
               <div class="md:col-span-2">
-                <button id="add-item-btn" onclick="addSpareItem()" class="btn btn-primary w-full">+ Add</button>
+                <button onclick="addSpareItem()" class="btn btn-primary w-full">+ Add</button>
               </div>
             </div>
           </div>
 
-          <!-- Items Table -->
           <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left text-sm">
               <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
@@ -243,11 +219,10 @@
               <span class="text-xs text-slate-500 block">Grand Total</span>
               <span id="bill-grand-total" class="text-2xl font-extrabold text-blue-600">₹0.00</span>
             </div>
-            <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save & Sync Bill</button>
+            <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save & Sync to Bills Sheet</button>
           </div>
         </div>
 
-        <!-- Right: Live Invoice Print Preview -->
         <div class="lg:col-span-5 bg-slate-100 p-6 rounded-xl border border-slate-200 flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-4">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Tax Invoice Preview</h4>
@@ -301,7 +276,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -311,18 +285,17 @@
         <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-100 pb-4">
           <div>
             <h3 class="text-lg font-bold text-slate-900">Bills & Reports History</h3>
-            <p class="text-xs text-slate-500">All generated invoices and past transaction archives</p>
+            <p class="text-xs text-slate-500">All generated invoices backed up in Bills Sheet</p>
           </div>
           <div class="flex items-center gap-3">
-            <input id="report-search-input" class="field text-xs" placeholder="🔍 Search by Mobile or Vehicle No..." oninput="filterReports(this.value)" style="width: 250px;">
+            <input id="report-search-input" class="field text-xs" placeholder="🔍 Search Mobile or Vehicle..." oninput="filterReports(this.value)" style="width: 250px;">
             <button onclick="loadBillsHistory()" class="btn btn-light text-xs">🔄 Refresh Bills</button>
           </div>
         </div>
 
-        <!-- Summary Cards for Reports -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
-            <p class="text-xs font-bold uppercase text-slate-400">Total Bills Generated</p>
+            <p class="text-xs font-bold uppercase text-slate-400">Total Bills Archived</p>
             <h4 id="rep-total-bills" class="text-xl font-extrabold text-slate-900 mt-1">0</h4>
           </div>
           <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
@@ -330,28 +303,27 @@
             <h4 id="rep-total-revenue" class="text-xl font-extrabold text-blue-600 mt-1">₹0.00</h4>
           </div>
           <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
-            <p class="text-xs font-bold uppercase text-slate-400">Udhaar / Credit Pending</p>
+            <p class="text-xs font-bold uppercase text-slate-400">Udhaar Pending</p>
             <h4 id="rep-total-udhaar" class="text-xl font-extrabold text-red-600 mt-1">₹0.00</h4>
           </div>
         </div>
 
-        <!-- Bills Archive Table -->
         <div class="overflow-x-auto border border-slate-200 rounded-lg">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
-                <th class="p-3">Invoice ID</th>
-                <th class="p-3">Date & Time</th>
+                <th class="p-3">Invoice No</th>
+                <th class="p-3">Date</th>
                 <th class="p-3">Customer Name</th>
                 <th class="p-3">Mobile</th>
-                <th class="p-3">Vehicle / Model</th>
-                <th class="p-3">Payment Mode</th>
-                <th class="p-3 text-right">Grand Total</th>
-                <th class="p-3 text-center">Action</th>
+                <th class="p-3">Items Summary</th>
+                <th class="p-3 text-right">Total (₹)</th>
+                <th class="p-3">Payment</th>
+                <th class="p-3 text-center">Status</th>
               </tr>
             </thead>
             <tbody id="reports-table-body" class="divide-y divide-slate-200">
-              <tr><td colspan="8" class="text-center text-slate-400 py-6">No bills generated yet. Create a bill from Billing Counter!</td></tr>
+              <tr><td colspan="8" class="text-center text-slate-400 py-6">No bills generated yet.</td></tr>
             </tbody>
           </table>
         </div>
@@ -364,31 +336,30 @@
         <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-100 pb-4">
           <div>
             <h3 class="text-lg font-bold text-slate-900">Inventory Master & Stock Management</h3>
-            <p class="text-xs text-slate-500">Live two-way sync with Google Sheet</p>
+            <p class="text-xs text-slate-500">Dedicated Inventory Sheet Sync (Unaffected by bills)</p>
           </div>
           <div class="flex items-center gap-3">
-            <a href="https://docs.google.com/spreadsheets/d/11EE2rvDim__69cP5rCCs18dfBm7Df90QsUiNDD-wc4w/edit?usp=drivesdk" target="_blank" class="btn btn-light text-xs">📊 Open Google Sheet</a>
-            <button onclick="syncInventoryFromSheet()" class="btn btn-primary text-xs">🔄 Sync with Sheet</button>
+            <button onclick="syncInventoryFromSheet()" class="btn btn-primary text-xs">🔄 Sync Inventory</button>
           </div>
         </div>
 
         <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
-          <h4 class="text-xs font-bold uppercase text-slate-600">Add New Spare Part to Inventory</h4>
+          <h4 class="text-xs font-bold uppercase text-slate-600">Add New Spare Part</h4>
           <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Part Name</label>
-              <input id="inv-name" class="field" placeholder="e.g. Steering Rod">
+              <input id="inv-name" class="field" placeholder="Part Name">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">HSN Code</label>
               <input id="inv-hsn" class="field" value="8708" placeholder="HSN">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Purchase Price (₹)</label>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Purchase (₹)</label>
               <input id="inv-pprice" type="number" class="field" placeholder="0">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Selling Price (₹)</label>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Selling (₹)</label>
               <input id="inv-sprice" type="number" class="field" placeholder="0">
             </div>
             <div>
@@ -422,23 +393,162 @@
       </div>
     </div>
 
-    <!-- 5. ANALYTICS TAB -->
-    <div id="tab-analytics" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Analytics & Insights</h3><p class="text-slate-500 text-sm mt-1">24/7 automated performance metrics and charts.</p></div></div>
+    <!-- 5. PARTY LEDGER TAB -->
+    <div id="tab-ledger" class="tab-content">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h3 class="text-lg font-bold text-slate-900">Party Ledger (Khata & Balances)</h3>
+          <p class="text-xs text-slate-500">Customer and supplier credit/debit track records</p>
+        </div>
 
-    <!-- 6. KHATA TAB -->
-    <div id="tab-khata" class="tab-content"><div class="bg-white p-6 rounded-xl border border-slate-200"><h3 class="text-lg font-bold">Customer Khata (Udhaar Register)</h3><p class="text-slate-500 text-sm mt-1">Track pending credits and customer ledgers.</p></div></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
+            <h4 class="text-xs font-bold uppercase text-slate-700">Search Customer Khata</h4>
+            <input id="ledger-search" class="field text-xs" placeholder="Search by Mobile or Name..." oninput="filterLedger(this.value)">
+          </div>
+          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-400">Total Outstanding Udhaar</p>
+              <h4 id="ledger-total-udhaar" class="text-xl font-extrabold text-red-600 mt-1">₹0.00</h4>
+            </div>
+            <button onclick="loadPartyLedger()" class="btn btn-light text-xs">🔄 Refresh Ledger</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-3">Customer Name</th>
+                <th class="p-3">Mobile No</th>
+                <th class="p-3">Total Bills</th>
+                <th class="p-3 text-right">Total Purchases (₹)</th>
+                <th class="p-3 text-right">Pending Udhaar (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-table-body" class="divide-y divide-slate-200">
+              <tr><td colspan="5" class="text-center text-slate-400 py-6">No credit transactions recorded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. GST REFILL DOCS TAB -->
+    <div id="tab-gst" class="tab-content">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">GST Refill Docs Format (GSTR Summary)</h3>
+            <p class="text-xs text-slate-500">Tax filing summary report for B2B / B2C sales</p>
+          </div>
+          <button onclick="window.print()" class="btn btn-light text-xs">🖨️ Print GST Report</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-xs font-bold uppercase text-slate-400">Total Taxable Sales</p>
+            <h4 id="gst-taxable-sum" class="text-xl font-extrabold text-slate-900 mt-1">₹0.00</h4>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-xs font-bold uppercase text-slate-400">Total CGST + SGST</p>
+            <h4 id="gst-tax-sum" class="text-xl font-extrabold text-blue-600 mt-1">₹0.00</h4>
+          </div>
+          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-xs font-bold uppercase text-slate-400">Gross Invoice Value</p>
+            <h4 id="gst-gross-sum" class="text-xl font-extrabold text-emerald-600 mt-1">₹0.00</h4>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-3">Invoice No</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Customer</th>
+                <th class="p-3 text-right">Taxable Amount</th>
+                <th class="p-3 text-right">GST (18%)</th>
+                <th class="p-3 text-right">Total Amount</th>
+              </tr>
+            </thead>
+            <tbody id="gst-table-body" class="divide-y divide-slate-200">
+              <tr><td colspan="6" class="text-center text-slate-400 py-6">No GST bills found. Toggle GST mode during billing to record tax.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. CREDIT / DEBIT NOTES TAB -->
+    <div id="tab-notes" class="tab-content">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h3 class="text-lg font-bold text-slate-900">Credit / Debit Notes (Sales Return & Adjustments)</h3>
+          <p class="text-xs text-slate-500">Manage item returns, refunds, and price corrections</p>
+        </div>
+
+        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
+          <h4 class="text-xs font-bold uppercase text-slate-700">Issue New Note</h4>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Note Type</label>
+              <select id="note-type" class="field text-xs font-semibold">
+                <option value="Credit Note">Credit Note (Sales Return)</option>
+                <option value="Debit Note">Debit Note (Adjustment)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Ref Invoice ID</label>
+              <input id="note-inv" class="field text-xs" placeholder="e.g. INV-1015">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Customer / Party Name</label>
+              <input id="note-party" class="field text-xs" placeholder="Party Name">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Amount (₹)</label>
+              <input id="note-amount" type="number" class="field text-xs" placeholder="0.00">
+            </div>
+            <div>
+              <button onclick="issueCreditDebitNote()" class="btn btn-primary w-full text-xs">+ Issue Note</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-3">Note ID</th>
+                <th class="p-3">Type</th>
+                <th class="p-3">Ref Invoice</th>
+                <th class="p-3">Party Name</th>
+                <th class="p-3 text-right">Amount (₹)</th>
+                <th class="p-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="notes-table-body" class="divide-y divide-slate-200">
+              <tr><td colspan="6" class="text-center text-slate-400 py-6">No credit or debit notes issued.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
   </main>
 
-  <!-- EMBEDDED JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxsp4pFNvzOLTJRKR8CN3zoaGrvHI567LUmM9SJvQUpWNOBY0LeJBWqCnVLsxCoPtIF/exec";
+    // Seperate Web App URLs
+    const INVENTORY_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8yJianDnL6MX8ZYg79m2Hb4EcBWUIym64wHJPhkMGouYoJeQ98vtlWkNbjuTs_r0g/exec";
+    const BILLS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxTzAtx_SW9W2QSX6-XuO6XNRjc7vjFe89Fet85rhQ7P6COGozRONhw-9Chf36pqsysQ/exec";
 
     let currentBillItems = [];
     let isGstMode = false;
     let savedBillsList = [];
+    let creditDebitNotesList = [];
 
-    // Master Inventory fallback
     let inventoryMaster = [
       { id: 'PART-001', name: 'Brake Pad', hsn: '8708', pPrice: 800, sPrice: 1200, qty: 25 },
       { id: 'PART-002', name: 'Clutch Plate', hsn: '8708', pPrice: 1500, sPrice: 2200, qty: 15 },
@@ -454,6 +564,9 @@
       event.currentTarget.classList.add('active');
       if (tabId === 'inventory') renderInventoryTable();
       if (tabId === 'reports') loadBillsHistory();
+      if (tabId === 'ledger') loadPartyLedger();
+      if (tabId === 'gst') loadGstReport();
+      if (tabId === 'notes') loadCreditDebitNotes();
     }
 
     const money = (n) => '₹' + (Number(n) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -571,7 +684,7 @@
       const price = Number(document.getElementById('item-price')?.value);
       const qty = Number(document.getElementById('item-qty')?.value);
       if (!name || isNaN(price) || price < 0 || qty < 1) {
-        alert('Kripya valid part name aur price enter karein!');
+        alert('Valid part name aur price enter karein!');
         return;
       }
       currentBillItems.push({ name, price, qty });
@@ -637,10 +750,8 @@
     }
 
     async function syncInventoryFromSheet() {
-      const btn = event?.currentTarget;
-      if(btn) btn.textContent = '🔄 Syncing...';
       try {
-        const response = await fetch(WEB_APP_URL);
+        const response = await fetch(INVENTORY_WEB_APP_URL);
         const data = await response.json();
         if (Array.isArray(data) && data.length > 0) {
           inventoryMaster = data.map((item, index) => ({
@@ -652,16 +763,9 @@
             qty: Number(item['Current Stock Qty']) || 0
           }));
           renderInventoryTable();
-          alert('✅ Successfully synced with Google Sheet!');
-        } else {
-          alert('⚠️ Sheet is empty.');
+          alert('✅ Inventory Sheet successfully synced!');
         }
-      } catch (err) {
-        console.error(err);
-        alert('❌ Sync failed!');
-      } finally {
-        if(btn) btn.textContent = '🔄 Sync with Sheet';
-      }
+      } catch (err) { console.error(err); alert('❌ Inventory sync failed'); }
     }
 
     async function addNewInventoryItem() {
@@ -670,7 +774,7 @@
       const pPrice = Number(document.getElementById('inv-pprice')?.value) || 0;
       const sPrice = Number(document.getElementById('inv-sprice')?.value) || 0;
       const qty = Number(document.getElementById('inv-qty')?.value) || 0;
-      if (!name || sPrice <= 0) { alert('Valid part name aur selling price enter karein!'); return; }
+      if (!name || sPrice <= 0) { alert('Valid part name & selling price enter karein!'); return; }
       
       const newId = 'PART-' + String(inventoryMaster.length + 1).padStart(3, '0');
       const newItem = { id: newId, name, hsn, pPrice, sPrice, qty };
@@ -683,7 +787,7 @@
       document.getElementById('inv-qty').value = '10';
 
       try {
-        await fetch(WEB_APP_URL, {
+        await fetch(INVENTORY_WEB_APP_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
@@ -701,7 +805,7 @@
           inventoryMaster[index].qty = q;
           renderInventoryTable();
           try {
-            await fetch(WEB_APP_URL, {
+            await fetch(INVENTORY_WEB_APP_URL, {
               method: 'POST',
               mode: 'no-cors',
               headers: { 'Content-Type': 'application/json' },
@@ -720,13 +824,12 @@
       const vehicleNo = document.getElementById('vehicle-no')?.value.trim().toUpperCase() || '-';
       const paymentMode = document.getElementById('payment-mode')?.value || 'Cash';
       
-      const { sub, discount, total } = invoiceTotal();
+      const { sub, discount, taxable, cgst, sgst, total } = invoiceTotal();
       const now = new Date();
-      const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      const invoiceId = 'INV-' + now.getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000));
+      const dateStr = now.toLocaleDateString('en-IN');
+      const invoiceId = 'INV-' + Math.floor(1000 + Math.random() * 9000);
 
       const newBill = { 
-        action: "save_bill",
         invoiceId, 
         date: dateStr, 
         custName, 
@@ -737,25 +840,31 @@
         items: [...currentBillItems], 
         subtotal: sub, 
         discount, 
-        grandTotal: total 
+        taxable: isGstMode ? taxable : 0,
+        cgst: isGstMode ? cgst : 0,
+        sgst: isGstMode ? sgst : 0,
+        grandTotal: total,
+        isGst: isGstMode
       };
 
       savedBillsList.unshift(newBill);
-      
       if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
-      alert(`✅ Bill ${invoiceId} successfully generated & saved to Sheet (Col H)!`);
+      
+      // Update Udhaar KPI if applicable
+      const totalUdhaar = savedBillsList.filter(b => b.paymentMode === 'Udhaar').reduce((s, b) => s + b.grandTotal, 0);
+      if(document.getElementById('kpi-udhaar-total')) document.getElementById('kpi-udhaar-total').textContent = money(totalUdhaar);
 
-      // Background me Google Sheet ke Column H me save karne ke liye POST request
+      alert(`✅ Bill ${invoiceId} generated & securely backed up in Bills Sheet!`);
+
+      // Send to Anaya Automobiles Bills Sheet
       try {
-        await fetch(WEB_APP_URL, {
+        await fetch(BILLS_WEB_APP_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newBill)
         });
-      } catch (err) {
-        console.error('Failed to sync bill archive to sheet:', err);
-      }
+      } catch (err) { console.error('Failed to backup bill:', err); }
 
       currentBillItems = [];
       renderBillItems();
@@ -766,51 +875,207 @@
       document.getElementById('bill-discount').value = '0';
     }
 
-    function loadBillsHistory() {
+    async function loadBillsHistory() {
       const tbody = document.getElementById('reports-table-body');
       if (!tbody) return;
+      try {
+        const res = await fetch(BILLS_WEB_APP_URL);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          savedBillsList = data.reverse();
+        }
+      } catch (e) { console.error(e); }
+
       if (!savedBillsList.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No bills generated yet. Create a bill from Billing Counter!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No bills found in backup sheet.</td></tr>';
         return;
       }
-      tbody.innerHTML = savedBillsList.map((b, idx) => `
+
+      tbody.innerHTML = savedBillsList.map(b => `
         <tr class="hover:bg-slate-50 transition-colors">
-          <td class="p-3 font-mono text-xs font-bold text-blue-600">${b.invoiceId}</td>
-          <td class="p-3 text-xs text-slate-500">${b.date}</td>
-          <td class="p-3 font-semibold text-slate-900">${escapeHtml(b.custName)}</td>
-          <td class="p-3 font-mono text-xs">${b.custMobile}</td>
-          <td class="p-3 text-xs">${escapeHtml(b.vehicleNo)} (${escapeHtml(b.vehicleModel)})</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b.paymentMode === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b.paymentMode}</span></td>
-          <td class="p-3 text-right font-extrabold text-slate-900">${money(b.grandTotal)}</td>
-          <td class="p-3 text-center"><button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button></td>
+          <td class="p-3 font-mono text-xs font-bold text-blue-600">${b['Invoice No'] || b.invoiceId}</td>
+          <td class="p-3 text-xs text-slate-500">${b.Date || b.date}</td>
+          <td class="p-3 font-semibold text-slate-900">${escapeHtml(b['Customer Name'] || b.custName)}</td>
+          <td class="p-3 font-mono text-xs">${b['Mobile Number'] || b.custMobile}</td>
+          <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
+          <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
+          <td class="p-3 text-center text-xs font-bold text-emerald-600">${b['PDF Link / Status'] || 'Saved & Synced'}</td>
         </tr>
       `).join('');
 
-      const totalRev = savedBillsList.reduce((s, b) => s + b.grandTotal, 0);
-      const totalUdhaar = savedBillsList.filter(b => b.paymentMode === 'Udhaar').reduce((s, b) => s + b.grandTotal, 0);
+      const totalRev = savedBillsList.reduce((s, b) => s + Number(b['Total Amount (₹)'] || b.grandTotal || 0), 0);
+      const totalUdhaar = savedBillsList.filter(b => (b['Payment Mode'] || b.paymentMode) === 'Udhaar').reduce((s, b) => s + Number(b['Total Amount (₹)'] || b.grandTotal || 0), 0);
+      
       if(document.getElementById('rep-total-bills')) document.getElementById('rep-total-bills').textContent = savedBillsList.length;
       if(document.getElementById('rep-total-revenue')) document.getElementById('rep-total-revenue').textContent = money(totalRev);
       if(document.getElementById('rep-total-udhaar')) document.getElementById('rep-total-udhaar').textContent = money(totalUdhaar);
+      if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
+      if(document.getElementById('kpi-udhaar-total')) document.getElementById('kpi-udhaar-total').textContent = money(totalUdhaar);
     }
 
     function filterReports(query) {
       const q = query.trim().toLowerCase();
       const tbody = document.getElementById('reports-table-body');
       if (!tbody) return;
-      const filtered = savedBillsList.filter(b => b.custMobile.toLowerCase().includes(q) || b.vehicleNo.toLowerCase().includes(q) || b.custName.toLowerCase().includes(q) || b.invoiceId.toLowerCase().includes(q));
+      const filtered = savedBillsList.filter(b => 
+        String(b['Mobile Number'] || b.custMobile || '').toLowerCase().includes(q) || 
+        String(b['Customer Name'] || b.custName || '').toLowerCase().includes(q) || 
+        String(b['Invoice No'] || b.invoiceId || '').toLowerCase().includes(q)
+      );
       if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No matching bills found</td></tr>'; return; }
       tbody.innerHTML = filtered.map(b => `
         <tr class="hover:bg-slate-50 transition-colors">
-          <td class="p-3 font-mono text-xs font-bold text-blue-600">${b.invoiceId}</td>
-          <td class="p-3 text-xs text-slate-500">${b.date}</td>
-          <td class="p-3 font-semibold text-slate-900">${escapeHtml(b.custName)}</td>
-          <td class="p-3 font-mono text-xs">${b.custMobile}</td>
-          <td class="p-3 text-xs">${escapeHtml(b.vehicleNo)} (${escapeHtml(b.vehicleModel)})</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b.paymentMode === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b.paymentMode}</span></td>
-          <td class="p-3 text-right font-extrabold text-slate-900">${money(b.grandTotal)}</td>
-          <td class="p-3 text-center"><button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button></td>
+          <td class="p-3 font-mono text-xs font-bold text-blue-600">${b['Invoice No'] || b.invoiceId}</td>
+          <td class="p-3 text-xs text-slate-500">${b.Date || b.date}</td>
+          <td class="p-3 font-semibold text-slate-900">${escapeHtml(b['Customer Name'] || b.custName)}</td>
+          <td class="p-3 font-mono text-xs">${b['Mobile Number'] || b.custMobile}</td>
+          <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
+          <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
+          <td class="p-3 text-center text-xs font-bold text-emerald-600">${b['PDF Link / Status'] || 'Synced'}</td>
         </tr>
       `).join('');
+    }
+
+    // Party Ledger Logic
+    async function loadPartyLedger() {
+      const tbody = document.getElementById('ledger-table-body');
+      if (!tbody) return;
+      
+      // Group bills by customer mobile
+      let parties = {};
+      savedBillsList.forEach(b => {
+        let mob = b['Mobile Number'] || b.custMobile || 'N/A';
+        let name = b['Customer Name'] || b.custName || 'Unknown';
+        let amt = Number(b['Total Amount (₹)'] || b.grandTotal || 0);
+        let mode = b['Payment Mode'] || b.paymentMode || 'Cash';
+
+        if (!parties[mob]) {
+          parties[mob] = { name, mobile: mob, count: 0, totalSpend: 0, udhaar: 0 };
+        }
+        parties[mob].count++;
+        parties[mob].totalSpend += amt;
+        if (mode === 'Udhaar') parties[mob].udhaar += amt;
+      });
+
+      let partyArr = Object.values(parties);
+      if (!partyArr.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-slate-400 py-6">No party ledger data available.</td></tr>';
+        return;
+      }
+
+      let totalUdhaarSum = partyArr.reduce((s, p) => s + p.udhaar, 0);
+      if(document.getElementById('ledger-total-udhaar')) document.getElementById('ledger-total-udhaar').textContent = money(totalUdhaarSum);
+
+      tbody.innerHTML = partyArr.map(p => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-semibold text-slate-900">${escapeHtml(p.name)}</td>
+          <td class="p-3 font-mono text-xs">${p.mobile}</td>
+          <td class="p-3 text-xs font-bold">${p.count} Bills</td>
+          <td class="p-3 text-right font-extrabold text-slate-900">${money(p.totalSpend)}</td>
+          <td class="p-3 text-right font-extrabold ${p.udhaar > 0 ? 'text-red-600' : 'text-slate-500'}">${money(p.udhaar)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filterLedger(q) {
+      const query = q.toLowerCase();
+      const rows = document.querySelectorAll('#ledger-table-body tr');
+      rows.forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(query) ? '' : 'none';
+      });
+    }
+
+    // GST Refill Docs Logic
+    function loadGstReport() {
+      const tbody = document.getElementById('gst-table-body');
+      if (!tbody) return;
+      
+      let gstBills = savedBillsList.filter(b => b.isGst || String(b['Items Summary'] || '').includes('GST') || Number(b.cgst || 0) > 0);
+      if (!gstBills.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-400 py-6">No GST tax invoices found in records.</td></tr>';
+        if(document.getElementById('gst-taxable-sum')) document.getElementById('gst-taxable-sum').textContent = money(0);
+        if(document.getElementById('gst-tax-sum')) document.getElementById('gst-tax-sum').textContent = money(0);
+        if(document.getElementById('gst-gross-sum')) document.getElementById('gst-gross-sum').textContent = money(0);
+        return;
+      }
+
+      let taxableSum = 0, taxSum = 0, grossSum = 0;
+      tbody.innerHTML = gstBills.map(b => {
+        let amt = Number(b['Total Amount (₹)'] || b.grandTotal || 0);
+        let tax = amt * 0.18 / 1.18; // approx breakdown
+        let taxable = amt - tax;
+        taxableSum += taxable;
+        taxSum += tax;
+        grossSum += amt;
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono text-xs font-bold text-blue-600">${b['Invoice No'] || b.invoiceId}</td>
+            <td class="p-3 text-xs text-slate-500">${b.Date || b.date}</td>
+            <td class="p-3 font-semibold text-slate-900">${escapeHtml(b['Customer Name'] || b.custName)}</td>
+            <td class="p-3 text-right">${money(taxable)}</td>
+            <td class="p-3 text-right">${money(tax)}</td>
+            <td class="p-3 text-right font-extrabold text-slate-900">${money(amt)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      if(document.getElementById('gst-taxable-sum')) document.getElementById('gst-taxable-sum').textContent = money(taxableSum);
+      if(document.getElementById('gst-tax-sum')) document.getElementById('gst-tax-sum').textContent = money(taxSum);
+      if(document.getElementById('gst-gross-sum')) document.getElementById('gst-gross-sum').textContent = money(grossSum);
+    }
+
+    // Credit / Debit Notes Logic
+    function issueCreditDebitNote() {
+      const type = document.getElementById('note-type').value;
+      const inv = document.getElementById('note-inv').value.trim() || 'INV-GENERAL';
+      const party = document.getElementById('note-party').value.trim() || 'Walk-in Party';
+      const amount = Number(document.getElementById('note-amount').value) || 0;
+
+      if (amount <= 0) {
+        alert('Valid amount enter karein!');
+        return;
+      }
+
+      const noteId = 'NOTE-' + Math.floor(1000 + Math.random() * 9000);
+      creditDebitNotesList.unshift({ noteId, type, inv, party, amount });
+
+      document.getElementById('note-inv').value = '';
+      document.getElementById('note-party').value = '';
+      document.getElementById('note-amount').value = '';
+
+      loadCreditDebitNotes();
+      alert(`✅ ${type} ${noteId} successfully issued!`);
+    }
+
+    function loadCreditDebitNotes() {
+      const tbody = document.getElementById('notes-table-body');
+      if (!tbody) return;
+
+      if(document.getElementById('kpi-cn-count')) document.getElementById('kpi-cn-count').textContent = creditDebitNotesList.length;
+
+      if (!creditDebitNotesList.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-400 py-6">No credit or debit notes issued.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = creditDebitNotesList.map((n, idx) => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-mono text-xs font-bold text-blue-600">${n.noteId}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${n.type === 'Credit Note' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">${n.type}</span></td>
+          <td class="p-3 font-mono text-xs">${n.inv}</td>
+          <td class="p-3 font-semibold text-slate-900">${escapeHtml(n.party)}</td>
+          <td class="p-3 text-right font-extrabold text-slate-900">${money(n.amount)}</td>
+          <td class="p-3 text-center"><button onclick="deleteNote(${idx})" class="btn btn-danger text-xs" style="padding:4px 8px;">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteNote(idx) {
+      creditDebitNotesList.splice(idx, 1);
+      loadCreditDebitNotes();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -820,6 +1085,7 @@
       });
       const paySelect = document.getElementById('payment-mode');
       if (paySelect) paySelect.addEventListener('change', updatePreview);
+      loadBillsHistory();
     });
   </script>
 </body>

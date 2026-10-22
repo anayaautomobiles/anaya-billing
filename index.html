@@ -116,10 +116,12 @@
           <div class="flex justify-between items-center border-b border-slate-100 pb-4">
             <div>
               <h3 class="text-lg font-bold text-slate-900">Billing Counter</h3>
-              <p class="text-xs text-slate-500">Auto backup & email shoot enabled</p>
+              <p id="billing-mode-label" class="text-xs text-slate-500">Creating New Invoice</p>
             </div>
             <button id="gst-toggle-btn" onclick="toggleGstMode()" class="btn btn-light text-xs font-bold">⚡ Mode: Regular Bill (No GST)</button>
           </div>
+
+          <input type="hidden" id="editing-invoice-id" value="">
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -219,7 +221,10 @@
               <span class="text-xs text-slate-500 block">Grand Total</span>
               <span id="bill-grand-total" class="text-2xl font-extrabold text-blue-600">₹0.00</span>
             </div>
-            <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save, Sync & Shoot Email</button>
+            <div class="flex gap-2">
+              <button id="cancel-edit-btn" onclick="resetBillingCounter()" class="hidden btn btn-light text-xs">Cancel Edit</button>
+              <button onclick="saveAndSyncBill()" class="btn btn-primary px-8 py-3 text-base">Save, Sync & Shoot Email</button>
+            </div>
           </div>
         </div>
 
@@ -541,7 +546,7 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     const INVENTORY_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8yJianDnL6MX8ZYg79m2Hb4EcBWUIym64wHJPhkMGouYoJeQ98vtlWkNbjuTs_r0g/exec";
-    const BILLS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxTzAtx_SW9W2QSX6-XuO6XNRjc7vjFe89Fet85rhQ7P6COGozRONhw-9Chf36pqsysQ/exec";
+    const BILLS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyy-kSMDyYTI6zPcYSCyprrwdgZymc0CqkyVFFu1bmYIXDWMrPOKZ87JehhDlXN2qOcZw/exec";
 
     let currentBillItems = [];
     let isGstMode = false;
@@ -830,7 +835,10 @@
       const { sub, discount, taxable, cgst, sgst, total } = invoiceTotal();
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-IN');
-      const invoiceId = 'INV-' + Math.floor(1000 + Math.random() * 9000);
+      
+      // Check if updating existing invoice or creating new
+      let existingId = document.getElementById('editing-invoice-id').value;
+      const invoiceId = existingId ? existingId : ('INV-' + Math.floor(1000 + Math.random() * 9000));
 
       const newBill = { 
         invoiceId, 
@@ -850,10 +858,17 @@
         isGst: isGstMode
       };
 
-      savedBillsList.unshift(newBill);
-      if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
+      if (existingId) {
+        // Update local array
+        let idx = savedBillsList.findIndex(b => (b['Invoice No'] || b.invoiceId) === existingId);
+        if (idx !== -1) savedBillsList[idx] = newBill;
+        alert(`✅ Bill ${invoiceId} successfully UPDATED in sheet & email triggered!`);
+      } else {
+        savedBillsList.unshift(newBill);
+        alert(`✅ Bill ${invoiceId} successfully SAVED to sheet & email triggered!`);
+      }
 
-      alert(`✅ Bill ${invoiceId} saved to sheet & email triggered!`);
+      if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
 
       try {
         await fetch(BILLS_WEB_APP_URL, {
@@ -862,15 +877,23 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newBill)
         });
-      } catch (err) { console.error('Failed to backup bill:', err); }
+      } catch (err) { console.error('Failed to backup/update bill:', err); }
 
+      resetBillingCounter();
+      loadBillsHistory();
+    }
+
+    function resetBillingCounter() {
       currentBillItems = [];
-      renderBillItems();
+      document.getElementById('editing-invoice-id').value = '';
+      document.getElementById('billing-mode-label').textContent = 'Creating New Invoice';
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
       document.getElementById('cust-name').value = 'Walk-in Customer';
       document.getElementById('cust-mobile').value = '';
       document.getElementById('vehicle-model').value = '';
       document.getElementById('vehicle-no').value = '';
       document.getElementById('bill-discount').value = '0';
+      renderBillItems();
     }
 
     async function loadBillsHistory() {
@@ -897,7 +920,7 @@
           <td class="p-3 font-mono text-xs">${b['Mobile Number'] || b.custMobile}</td>
           <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
           <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${(b['Payment Mode'] || b.paymentMode) === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
           <td class="p-3 text-center flex items-center justify-center gap-2">
             <button onclick="editBillToCounter(${idx})" class="btn btn-light text-xs" style="padding:4px 8px;">✏️ Edit</button>
             <button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button>
@@ -919,6 +942,11 @@
       const b = savedBillsList[idx];
       if (!b) return;
 
+      const invNo = b['Invoice No'] || b.invoiceId;
+      document.getElementById('editing-invoice-id').value = invNo;
+      document.getElementById('billing-mode-label').textContent = 'Editing Invoice: ' + invNo;
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
       document.getElementById('cust-name').value = b['Customer Name'] || b.custName || '';
       document.getElementById('cust-mobile').value = b['Mobile Number'] || b.custMobile || '';
       document.getElementById('payment-mode').value = b['Payment Mode'] || b.paymentMode || 'Cash';
@@ -926,12 +954,13 @@
       if (b.items && Array.isArray(b.items)) {
         currentBillItems = [...b.items];
       } else {
-        currentBillItems = [];
+        // Fallback if items stored as summary string
+        currentBillItems = [{ name: b['Items Summary'] || 'Custom Part', price: Number(b['Total Amount (₹)'] || b.grandTotal || 0), qty: 1 }];
       }
 
       renderBillItems();
       switchTab('billing');
-      alert(`✏️ Bill ${b['Invoice No'] || b.invoiceId} loaded into Billing Counter!`);
+      alert(`✏️ Invoice ${invNo} loaded for editing! Save changes to update sheet.`);
     }
 
     function filterReports(query) {
@@ -952,7 +981,7 @@
           <td class="p-3 font-mono text-xs">${b['Mobile Number'] || b.custMobile}</td>
           <td class="p-3 text-xs">${escapeHtml(b['Items Summary'] || '')}</td>
           <td class="p-3 text-right font-extrabold text-slate-900">${money(b['Total Amount (₹)'] || b.grandTotal)}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${b['Payment Mode'] === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${(b['Payment Mode'] || b.paymentMode) === 'Udhaar' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${b['Payment Mode'] || b.paymentMode}</span></td>
           <td class="p-3 text-center flex items-center justify-center gap-2">
             <button onclick="editBillToCounter(${idx})" class="btn btn-light text-xs" style="padding:4px 8px;">✏️ Edit</button>
             <button onclick="window.print()" class="btn btn-light text-xs" style="padding:4px 8px;">🖨️ Print</button>

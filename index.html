@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet & Auto-Email Active</span>
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet & Visuals Active</span>
         <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
       </div>
     </div>
@@ -75,38 +75,21 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
 
-    <!-- 1. OVERVIEW TAB -->
-    <div id="tab-overview" class="tab-content active space-y-6">
-      <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+    <!-- 1. OVERVIEW TAB (Interconnected with dashboard-visuals.html) -->
+    <div id="tab-overview" class="tab-content active space-y-4">
+      <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <div>
-          <h2 class="text-2xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
-          <p class="text-sm text-slate-500">Inventory sheet & Bills backup sheet with auto-email shoot are online.</p>
+          <h2 class="text-xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
+          <p class="text-xs text-slate-500">Live Visual Performance & Analytics Dashboard</p>
         </div>
-        <button onclick="switchTab('billing')" class="btn btn-primary">+ Create New Bill</button>
+        <div class="flex gap-2">
+          <button onclick="syncVisualsIframe()" class="btn btn-light text-xs">🔄 Refresh Visuals</button>
+          <button onclick="switchTab('billing')" class="btn btn-primary text-xs">+ Create New Bill</button>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Saved Bills</p>
-          <h3 id="kpi-total-bills" class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Backed up in Bills Sheet</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Stock Parts</p>
-          <h3 id="kpi-stock-count" class="text-2xl font-extrabold text-slate-900 mt-2">5</h3>
-          <p class="text-xs text-slate-500 mt-1">Active inventory master</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Credit Notes</p>
-          <h3 id="kpi-cn-count" class="text-2xl font-extrabold text-slate-900 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Returns / adjustments</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Udhaar</p>
-          <h3 id="kpi-udhaar-total" class="text-2xl font-extrabold text-red-600 mt-2">₹0.00</h3>
-          <p class="text-xs text-slate-500 mt-1">Ledger balance</p>
-        </div>
-      </div>
+      <!-- Embedded Visuals Component File -->
+      <iframe id="visuals-iframe" src="dashboard-visuals.html" class="w-full border-none min-h-[700px] rounded-xl shadow-sm" onload="syncVisualsIframe()"></iframe>
     </div>
 
     <!-- 2. BILLING COUNTER TAB -->
@@ -570,6 +553,7 @@
         if(t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
       });
 
+      if (tabId === 'overview') syncVisualsIframe();
       if (tabId === 'inventory') renderInventoryTable();
       if (tabId === 'reports') loadBillsHistory();
       if (tabId === 'ledger') loadPartyLedger();
@@ -754,7 +738,6 @@
           <td class="p-3"><button class="btn btn-light" style="padding:4px 8px; font-size:11px" onclick="editStock(${idx})">Edit Qty</button></td>
         </tr>
       `).join('');
-      if(document.getElementById('kpi-stock-count')) document.getElementById('kpi-stock-count').textContent = inventoryMaster.length;
     }
 
     async function syncInventoryFromSheet() {
@@ -771,6 +754,7 @@
             qty: Number(item['Current Stock Qty']) || 0
           }));
           renderInventoryTable();
+          syncVisualsIframe();
           alert('✅ Inventory Sheet successfully synced!');
         }
       } catch (err) { console.error(err); alert('❌ Inventory sync failed'); }
@@ -788,6 +772,7 @@
       const newItem = { id: newId, name, hsn, pPrice, sPrice, qty };
       inventoryMaster.push(newItem);
       renderInventoryTable();
+      syncVisualsIframe();
 
       document.getElementById('inv-name').value = '';
       document.getElementById('inv-pprice').value = '';
@@ -812,6 +797,7 @@
         if (!isNaN(q) && q >= 0) {
           inventoryMaster[index].qty = q;
           renderInventoryTable();
+          syncVisualsIframe();
           try {
             await fetch(INVENTORY_WEB_APP_URL, {
               method: 'POST',
@@ -836,7 +822,6 @@
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-IN');
       
-      // Check if updating existing invoice or creating new
       let existingId = document.getElementById('editing-invoice-id').value;
       const invoiceId = existingId ? existingId : ('INV-' + Math.floor(1000 + Math.random() * 9000));
 
@@ -859,7 +844,6 @@
       };
 
       if (existingId) {
-        // Update local array
         let idx = savedBillsList.findIndex(b => (b['Invoice No'] || b.invoiceId) === existingId);
         if (idx !== -1) savedBillsList[idx] = newBill;
         alert(`✅ Bill ${invoiceId} successfully UPDATED in sheet & email triggered!`);
@@ -868,7 +852,7 @@
         alert(`✅ Bill ${invoiceId} successfully SAVED to sheet & email triggered!`);
       }
 
-      if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
+      syncVisualsIframe();
 
       try {
         await fetch(BILLS_WEB_APP_URL, {
@@ -907,6 +891,8 @@
         }
       } catch (e) { console.error(e); }
 
+      syncVisualsIframe();
+
       if (!savedBillsList.length) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No bills found in backup sheet.</td></tr>';
         return;
@@ -934,8 +920,6 @@
       if(document.getElementById('rep-total-bills')) document.getElementById('rep-total-bills').textContent = savedBillsList.length;
       if(document.getElementById('rep-total-revenue')) document.getElementById('rep-total-revenue').textContent = money(totalRev);
       if(document.getElementById('rep-total-udhaar')) document.getElementById('rep-total-udhaar').textContent = money(totalUdhaar);
-      if(document.getElementById('kpi-total-bills')) document.getElementById('kpi-total-bills').textContent = savedBillsList.length;
-      if(document.getElementById('kpi-udhaar-total')) document.getElementById('kpi-udhaar-total').textContent = money(totalUdhaar);
     }
 
     function editBillToCounter(idx) {
@@ -954,7 +938,6 @@
       if (b.items && Array.isArray(b.items)) {
         currentBillItems = [...b.items];
       } else {
-        // Fallback if items stored as summary string
         currentBillItems = [{ name: b['Items Summary'] || 'Custom Part', price: Number(b['Total Amount (₹)'] || b.grandTotal || 0), qty: 1 }];
       }
 
@@ -1102,8 +1085,6 @@
       const tbody = document.getElementById('notes-table-body');
       if (!tbody) return;
 
-      if(document.getElementById('kpi-cn-count')) document.getElementById('kpi-cn-count').textContent = creditDebitNotesList.length;
-
       if (!creditDebitNotesList.length) {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-400 py-6">No credit or debit notes issued.</td></tr>';
         return;
@@ -1124,6 +1105,18 @@
     function deleteNote(idx) {
       creditDebitNotesList.splice(idx, 1);
       loadCreditDebitNotes();
+    }
+
+    // Interconnect Function with dashboard-visuals.html iframe
+    function syncVisualsIframe() {
+      const iframe = document.getElementById('visuals-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.savedBillsList = savedBillsList;
+        iframe.contentWindow.inventoryMaster = inventoryMaster;
+        if (typeof iframe.contentWindow.renderDashboardVisuals === 'function') {
+          iframe.contentWindow.renderDashboardVisuals();
+        }
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

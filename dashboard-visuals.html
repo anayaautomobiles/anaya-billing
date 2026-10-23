@@ -1,0 +1,101 @@
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+  var headers = rows[0];
+  var data = [];
+  
+  for (var i = 1; i < rows.length; i++) {
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j]] = rows[i][j];
+    }
+    data.push(obj);
+  }
+  
+  var output = ContentService.createTextOutput(JSON.stringify(data));
+  output.setMimeType(ContentService.MimeType.JSON);
+  return output;
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  try {
+    var data = JSON.parse(e.postData.contents);
+    
+    // 1. Items Summary (Vehicle info completely removed, only items & prices)
+    var itemsSummary = "";
+    if (data.items && Array.isArray(data.items)) {
+      itemsSummary = data.items.map(function(item) {
+        return item.name + " (" + item.qty + " x ₹" + item.price + ")";
+      }).join(", ");
+    }
+
+    var rows = sheet.getDataRange().getValues();
+    var invoiceNoCol = 0; // Column A (Invoice No)
+    var foundRow = -1;
+
+    // Check if Invoice already exists (For Edit / Update)
+    if (data.invoiceId) {
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][invoiceNoCol]).trim() === String(data.invoiceId).trim()) {
+          foundRow = i + 1; // 1-based row index
+          break;
+        }
+      }
+    }
+
+    if (foundRow !== -1) {
+      // 2. Update existing row if edited
+      sheet.getRange(foundRow, 2).setValue(data.date);           // Date
+      sheet.getRange(foundRow, 3).setValue(data.custName);       // Customer Name
+      sheet.getRange(foundRow, 4).setValue(data.custMobile);     // Mobile Number
+      sheet.getRange(foundRow, 5).setValue(itemsSummary);        // Items Summary (Clean)
+      sheet.getRange(foundRow, 6).setValue(data.grandTotal);     // Total Amount
+      sheet.getRange(foundRow, 7).setValue(data.paymentMode);    // Payment Mode
+      sheet.getRange(foundRow, 8).setValue("Updated & Emailed"); // Status
+    } else {
+      // 3. Append new row if brand new bill
+      sheet.appendRow([
+        data.invoiceId,          // Col A: Invoice No
+        data.date,               // Col B: Date
+        data.custName,           // Col C: Customer Name
+        data.custMobile,         // Col D: Mobile Number
+        itemsSummary,            // Col E: Items Summary (Clean)
+        data.grandTotal,         // Col F: Total Amount (₹)
+        data.paymentMode,        // Col G: Payment Mode
+        "Saved & Emailed"        // Col H: Status
+      ]);
+    }
+    
+    // 4. Email Shoot System
+    var recipientEmails = "Narendravishwakarma337@gmail.com, megastarayush@gmail.com, anayaautomobiles.tmp@gmail.com"; 
+    var emailSubject = "📄 Invoice Update/Generated: " + data.invoiceId + " - " + data.custName;
+    var emailBody = "Hello Anaya Automobiles Admin,\n\n" +
+                    "An invoice has been saved/updated on the Billing Counter.\n\n" +
+                    "----------------------------------------\n" +
+                    "Invoice No: " + data.invoiceId + "\n" +
+                    "Date: " + data.date + "\n" +
+                    "Customer Name: " + data.custName + "\n" +
+                    "Mobile No: " + data.custMobile + "\n" +
+                    "Vehicle: " + (data.vehicleModel || '-') + " (" + (data.vehicleNo || '-') + ")\n" +
+                    "Items Purchased: " + itemsSummary + "\n" +
+                    "Grand Total: ₹" + data.grandTotal + "\n" +
+                    "Payment Mode: " + data.paymentMode + "\n" +
+                    "----------------------------------------\n\n" +
+                    "Thank you,\nAnaya Automobiles Automation System";
+
+    try {
+      MailApp.sendEmail(recipientEmails, emailSubject, emailBody);
+    } catch(mailErr) {
+      Logger.log("Email error: " + mailErr.toString());
+    }
+
+    var output = ContentService.createTextOutput(JSON.stringify({status: "success", message: "Processed successfully"}));
+    output.setMimeType(ContentService.MimeType.JSON);
+    return output;
+  } catch(err) {
+    var output = ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}));
+    output.setMimeType(ContentService.MimeType.JSON);
+    return output;
+  }
+}

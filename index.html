@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Dual-Sheet & Visuals Active</span>
+        <span class="text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-medium">⚡ Single-File & Live Visuals Active</span>
         <div class="text-xs font-semibold px-3 py-1.5 rounded bg-blue-600 text-white">Anaya Admin</div>
       </div>
     </div>
@@ -73,23 +73,139 @@
   </nav>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-    <!-- 1. OVERVIEW TAB (Interconnected with dashboard-visuals.html) -->
-    <div id="tab-overview" class="tab-content active space-y-4">
-      <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+    <!-- 1. OVERVIEW TAB (Built-in Visual Dashboard) -->
+    <div id="tab-overview" class="tab-content active space-y-6">
+      <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div>
           <h2 class="text-xl font-extrabold text-slate-900">Welcome back, Admin 👋</h2>
           <p class="text-xs text-slate-500">Live Visual Performance & Analytics Dashboard</p>
         </div>
         <div class="flex gap-2">
-          <button onclick="syncVisualsIframe()" class="btn btn-light text-xs">🔄 Refresh Visuals</button>
+          <button onclick="renderDashboardVisuals()" class="btn btn-light text-xs">🔄 Refresh Visuals</button>
           <button onclick="switchTab('billing')" class="btn btn-primary text-xs">+ Create New Bill</button>
         </div>
       </div>
 
-      <!-- Embedded Visuals Component File -->
-      <iframe id="visuals-iframe" src="dashboard-visuals.html" class="w-full border-none min-h-[700px] rounded-xl shadow-sm" onload="syncVisualsIframe()"></iframe>
+      <!-- TOP STATS VISUAL CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider text-blue-100/80">Today's Total Sales</p>
+              <h3 id="vis-kpi-today-sales" class="text-3xl font-extrabold tracking-tight mt-2">₹0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl">💰</div>
+          </div>
+          <div class="mt-4 flex items-center gap-2 text-xs text-blue-100">
+            <span class="px-2 py-0.5 rounded-md bg-white/20 font-semibold" id="vis-today-count">0 Bills</span>
+            <span>Generated Today</span>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/20 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider text-emerald-100/80">This Month Sales</p>
+              <h3 id="vis-kpi-month-sales" class="text-3xl font-extrabold tracking-tight mt-2">₹0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl">📈</div>
+          </div>
+          <div class="mt-4 flex items-center gap-2 text-xs text-emerald-100">
+            <span class="px-2 py-0.5 rounded-md bg-white/20 font-semibold" id="vis-month-count">0 Invoices</span>
+            <span>Monthly Archive</span>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/20 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider text-amber-100/80">Inventory Parts</p>
+              <h3 id="vis-kpi-stock-count" class="text-3xl font-extrabold tracking-tight mt-2">5</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl">⚙️</div>
+          </div>
+          <div class="mt-4 flex items-center gap-2 text-xs text-amber-100">
+            <span class="px-2 py-0.5 rounded-md bg-white/20 font-semibold">Live Master</span>
+            <span>Synced with Sheet</span>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-rose-600 to-red-700 rounded-2xl p-5 text-white shadow-lg shadow-rose-500/20 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider text-rose-100/80">Outstanding Udhaar</p>
+              <h3 id="vis-kpi-udhaar-total" class="text-3xl font-extrabold tracking-tight mt-2">₹0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl">📕</div>
+          </div>
+          <div class="mt-4 flex items-center gap-2 text-xs text-rose-100">
+            <span class="px-2 py-0.5 rounded-md bg-white/20 font-semibold">Party Ledger</span>
+            <span>Pending Collection</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS VISUAL WIDGETS SECTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm">Payment Methods Breakdown</h4>
+              <p class="text-xs text-slate-400">Cash vs UPI vs Udhaar share</p>
+            </div>
+            <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">Visual Metrics</span>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                <span>Cash Transactions</span>
+                <span id="vis-pay-cash-amt">₹0.00</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="vis-bar-cash" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                <span>UPI Payments</span>
+                <span id="vis-pay-upi-amt">₹0.00</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="vis-bar-upi" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                <span>Udhaar (Credit Sales)</span>
+                <span id="vis-pay-udhaar-amt">₹0.00</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="vis-bar-udhaar" class="bg-rose-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm">Live System Stream</h4>
+              <p class="text-xs text-slate-400">Real-time backup & sync feed</p>
+            </div>
+          </div>
+
+          <div id="vis-recent-stream" class="space-y-3 max-h-56 overflow-y-auto pr-1">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-400 text-center">
+              No recent bills synced yet.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 2. BILLING COUNTER TAB -->
@@ -553,7 +669,7 @@
         if(t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
       });
 
-      if (tabId === 'overview') syncVisualsIframe();
+      if (tabId === 'overview') renderDashboardVisuals();
       if (tabId === 'inventory') renderInventoryTable();
       if (tabId === 'reports') loadBillsHistory();
       if (tabId === 'ledger') loadPartyLedger();
@@ -754,7 +870,7 @@
             qty: Number(item['Current Stock Qty']) || 0
           }));
           renderInventoryTable();
-          syncVisualsIframe();
+          renderDashboardVisuals();
           alert('✅ Inventory Sheet successfully synced!');
         }
       } catch (err) { console.error(err); alert('❌ Inventory sync failed'); }
@@ -772,7 +888,7 @@
       const newItem = { id: newId, name, hsn, pPrice, sPrice, qty };
       inventoryMaster.push(newItem);
       renderInventoryTable();
-      syncVisualsIframe();
+      renderDashboardVisuals();
 
       document.getElementById('inv-name').value = '';
       document.getElementById('inv-pprice').value = '';
@@ -797,7 +913,7 @@
         if (!isNaN(q) && q >= 0) {
           inventoryMaster[index].qty = q;
           renderInventoryTable();
-          syncVisualsIframe();
+          renderDashboardVisuals();
           try {
             await fetch(INVENTORY_WEB_APP_URL, {
               method: 'POST',
@@ -852,7 +968,7 @@
         alert(`✅ Bill ${invoiceId} successfully SAVED to sheet & email triggered!`);
       }
 
-      syncVisualsIframe();
+      renderDashboardVisuals();
 
       try {
         await fetch(BILLS_WEB_APP_URL, {
@@ -891,7 +1007,7 @@
         }
       } catch (e) { console.error(e); }
 
-      syncVisualsIframe();
+      renderDashboardVisuals();
 
       if (!savedBillsList.length) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-slate-400 py-6">No bills found in backup sheet.</td></tr>';
@@ -922,6 +1038,7 @@
       if(document.getElementById('rep-total-udhaar')) document.getElementById('rep-total-udhaar').textContent = money(totalUdhaar);
     }
 
+    // FIXED EDIT FUNCTION: Parses string items from sheet into separate individual item boxes
     function editBillToCounter(idx) {
       const b = savedBillsList[idx];
       if (!b) return;
@@ -933,17 +1050,42 @@
 
       document.getElementById('cust-name').value = b['Customer Name'] || b.custName || '';
       document.getElementById('cust-mobile').value = b['Mobile Number'] || b.custMobile || '';
+      document.getElementById('vehicle-model').value = b['Vehicle Model'] || b.vehicleModel || '';
+      document.getElementById('vehicle-no').value = b['Vehicle Number'] || b.vehicleNo || '';
       document.getElementById('payment-mode').value = b['Payment Mode'] || b.paymentMode || 'Cash';
-      
-      if (b.items && Array.isArray(b.items)) {
-        currentBillItems = [...b.items];
+      document.getElementById('bill-discount').value = b['Discount'] || b.discount || '0';
+
+      if (b.items && Array.isArray(b.items) && b.items.length > 0) {
+        currentBillItems = b.items.map(i => ({
+          name: i.name || 'Part',
+          price: Number(i.price) || 0,
+          qty: Number(i.qty) || 1
+        }));
       } else {
-        currentBillItems = [{ name: b['Items Summary'] || 'Custom Part', price: Number(b['Total Amount (₹)'] || b.grandTotal || 0), qty: 1 }];
+        let rawSummary = b['Items Summary'] || b.itemsSummary || '';
+        let parsedItems = [];
+        
+        if (rawSummary) {
+          let partsList = rawSummary.split(', ');
+          partsList.forEach(pStr => {
+            let match = pStr.match(/^(.*?)\s*\((\d+)\s*x\s*₹?([\d.]+)\)/);
+            if (match) {
+              parsedItems.push({
+                name: match[1].trim(),
+                qty: parseInt(match[2]) || 1,
+                price: parseFloat(match[3]) || 0
+              });
+            } else {
+              parsedItems.push({ name: pStr.trim(), price: Number(b['Total Amount (₹)'] || b.grandTotal || 0), qty: 1 });
+            }
+          });
+        }
+
+        currentBillItems = parsedItems.length > 0 ? parsedItems : [{ name: 'Custom Part', price: Number(b['Total Amount (₹)'] || b.grandTotal || 0), qty: 1 }];
       }
 
       renderBillItems();
       switchTab('billing');
-      alert(`✏️ Invoice ${invNo} loaded for editing! Save changes to update sheet.`);
     }
 
     function filterReports(query) {
@@ -994,7 +1136,7 @@
 
       let partyArr = Object.values(parties);
       if (!partyArr.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-slate-400 py-6">No party ledger data available.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-slate-400 py-6">No credit transactions recorded yet.</td></tr>';
         return;
       }
 
@@ -1065,10 +1207,7 @@
       const party = document.getElementById('note-party').value.trim() || 'Walk-in Party';
       const amount = Number(document.getElementById('note-amount').value) || 0;
 
-      if (amount <= 0) {
-        alert('Valid amount enter karein!');
-        return;
-      }
+      if (amount <= 0) { alert('Valid amount enter karein!'); return; }
 
       const noteId = 'NOTE-' + Math.floor(1000 + Math.random() * 9000);
       creditDebitNotesList.unshift({ noteId, type, inv, party, amount });
@@ -1107,14 +1246,60 @@
       loadCreditDebitNotes();
     }
 
-    // Interconnect Function with dashboard-visuals.html iframe
-    function syncVisualsIframe() {
-      const iframe = document.getElementById('visuals-iframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.savedBillsList = savedBillsList;
-        iframe.contentWindow.inventoryMaster = inventoryMaster;
-        if (typeof iframe.contentWindow.renderDashboardVisuals === 'function') {
-          iframe.contentWindow.renderDashboardVisuals();
+    // Built-in Dashboard Visuals Renderer Function (Refreshes instantly on click)
+    function renderDashboardVisuals() {
+      let todayStr = new Date().toLocaleDateString('en-IN');
+      let todayBills = savedBillsList.filter(b => (b.Date || b.date || '').includes(todayStr));
+      let todayTotal = todayBills.reduce((s, b) => s + Number(b['Total Amount (₹)'] || b.grandTotal || 0), 0);
+      
+      let monthTotal = savedBillsList.reduce((s, b) => s + Number(b['Total Amount (₹)'] || b.grandTotal || 0), 0);
+      let udhaarTotal = savedBillsList.filter(b => (b['Payment Mode'] || b.paymentMode) === 'Udhaar').reduce((s, b) => s + Number(b['Total Amount (₹)'] || b.grandTotal || 0), 0);
+
+      if (document.getElementById('vis-kpi-today-sales')) document.getElementById('vis-kpi-today-sales').textContent = money(todayTotal);
+      if (document.getElementById('vis-today-count')) document.getElementById('vis-today-count').textContent = todayBills.length + ' Bills';
+      if (document.getElementById('vis-kpi-month-sales')) document.getElementById('vis-kpi-month-sales').textContent = money(monthTotal);
+      if (document.getElementById('vis-month-count')) document.getElementById('vis-month-count').textContent = savedBillsList.length + ' Total Invoices';
+      if (document.getElementById('vis-kpi-udhaar-total')) document.getElementById('vis-kpi-udhaar-total').textContent = money(udhaarTotal);
+      if (document.getElementById('vis-kpi-stock-count')) document.getElementById('vis-kpi-stock-count').textContent = inventoryMaster.length;
+
+      let cashSum = 0, upiSum = 0, udhaarSum = 0;
+      savedBillsList.forEach(b => {
+        let mode = b['Payment Mode'] || b.paymentMode || 'Cash';
+        let amt = Number(b['Total Amount (₹)'] || b.grandTotal || 0);
+        if (mode === 'Cash') cashSum += amt;
+        else if (mode.includes('UPI')) upiSum += amt;
+        else if (mode === 'Udhaar') udhaarSum += amt;
+      });
+
+      let totalAll = cashSum + upiSum + udhaarSum || 1;
+      if (document.getElementById('vis-pay-cash-amt')) document.getElementById('vis-pay-cash-amt').textContent = money(cashSum);
+      if (document.getElementById('vis-pay-upi-amt')) document.getElementById('vis-pay-upi-amt').textContent = money(upiSum);
+      if (document.getElementById('vis-pay-udhaar-amt')) document.getElementById('vis-pay-udhaar-amt').textContent = money(udhaarSum);
+
+      if (document.getElementById('vis-bar-cash')) document.getElementById('vis-bar-cash').style.width = Math.round((cashSum / totalAll) * 100) + '%';
+      if (document.getElementById('vis-bar-upi')) document.getElementById('vis-bar-upi').style.width = Math.round((upiSum / totalAll) * 100) + '%';
+      if (document.getElementById('vis-bar-udhaar')) document.getElementById('vis-bar-udhaar').style.width = Math.round((udhaarSum / totalAll) * 100) + '%';
+
+      let streamContainer = document.getElementById('vis-recent-stream');
+      if (streamContainer) {
+        if (!savedBillsList.length) {
+          streamContainer.innerHTML = '<div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-400 text-center">No recent bills synced yet.</div>';
+        } else {
+          streamContainer.innerHTML = savedBillsList.slice(0, 5).map(b => `
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs">⚡</div>
+                <div>
+                  <p class="text-xs font-bold text-slate-800">${escapeHtml(b['Customer Name'] || b.custName)} <span class="text-slate-400 font-normal">(${b['Invoice No'] || b.invoiceId})</span></p>
+                  <p class="text-[10px] text-slate-400">${b.Date || b.date} • ${escapeHtml(b['Items Summary'] || 'Custom Sale')}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-extrabold text-slate-900 block">${money(b['Total Amount (₹)'] || b.grandTotal)}</span>
+                <span class="text-[10px] font-bold text-emerald-600">${b['Payment Mode'] || b.paymentMode}</span>
+              </div>
+            </div>
+          `).join('');
         }
       }
     }
